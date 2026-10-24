@@ -17,4 +17,8 @@ Handcrafted artisanal e-commerce web storefront for **RSA Creations**.
 Deploy this folder as a static site to:
 - **Vercel** / **Netlify** / **GitHub Pages** / **Firebase Hosting**
 
-To connect with your backend API on Render/Railway/Heroku, ensure your backend URL is accessible.
+## Backend Integration
+Connected to live Render Web Service:
+- **Backend URL**: `https://rsa-backend-74v7.onrender.com`
+- Configured in `app.js` and `admin.js` via `API_BASE`
+

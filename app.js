@@ -1,7 +1,13 @@
 /**
  * RSA Creations - Client-side Interactive Logic
- * Connected to Node.js / Express Backend (Port 5000)
+ * Connected to Render Production Backend
  */
+
+// Backend Base URL (Auto-detects localhost or Render Cloud Service)
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+  ? 'http://localhost:5000'
+  : 'https://rsa-backend-74v7.onrender.com';
+
 
 // Handcrafted Product Catalog (Default INR Prices)
 const PRODUCTS = [
@@ -431,7 +437,7 @@ function openAddressModal() {
 
 async function fetchProductsFromBackend() {
   try {
-    const res = await fetch('/api/products');
+    const res = await fetch(`${API_BASE}/api/products`);
     if (res.ok) {
       const data = await res.json();
       if (data.products && data.products.length > 0) {
@@ -449,7 +455,7 @@ async function updateShippingCalculation(city = 'Kolkata', pincode = '700001', s
   const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   try {
-    const response = await fetch('/api/shipping/calculate', {
+    const response = await fetch(`${API_BASE}/api/shipping/calculate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city, pincode, state: stateName, subtotal })
@@ -1040,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)
@@ -1125,7 +1131,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = loginPassword.value;
 
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ identifier, password })
@@ -1174,7 +1180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const res = await fetch('/api/auth/signup', {
+        const res = await fetch(`${API_BASE}/api/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, mobile, password })
@@ -1228,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const res = await fetch(`/api/auth/profile/${state.currentUser.userId}`, {
+        const res = await fetch(`${API_BASE}/api/auth/profile/${state.currentUser.userId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ address: street, city, pincode, state: stateVal })
@@ -1294,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', () => {
       userDropdown.style.display = 'none';
       if (!state.currentUser) return;
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch(`${API_BASE}/api/orders`);
         if (res.ok) {
           const data = await res.json();
           const userOrders = (data.orders || []).filter(o => 

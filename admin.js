@@ -3,7 +3,10 @@
  * Connects directly to unified backend APIs
  */
 
-const API_BASE = '';
+// Backend Base URL (Auto-detects localhost or Render Cloud Service)
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+  ? 'http://localhost:5000'
+  : 'https://rsa-backend-74v7.onrender.com';
 let currentTab = 'overview';
 let allOrders = [];
 let allCustomers = [];
@@ -78,7 +81,7 @@ if (adminLoginForm) {
     adminLoginError.style.display = 'none';
 
     try {
-      const res = await fetch('/api/admin/login', {
+      const res = await fetch(`${API_BASE}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -149,7 +152,7 @@ async function loadAllAdminData() {
 
 async function fetchStats() {
   try {
-    const res = await fetch('/api/admin/stats');
+    const res = await fetch(`${API_BASE}/api/admin/stats`);
     if (res.ok) {
       const data = await res.json();
       const s = data.stats;
@@ -168,7 +171,7 @@ async function fetchStats() {
 
 async function fetchOrders() {
   try {
-    const res = await fetch('/api/admin/orders');
+    const res = await fetch(`${API_BASE}/api/admin/orders`);
     if (res.ok) {
       const data = await res.json();
       allOrders = data.orders || [];
@@ -182,7 +185,7 @@ async function fetchOrders() {
 
 async function fetchCustomers() {
   try {
-    const res = await fetch('/api/admin/customers');
+    const res = await fetch(`${API_BASE}/api/admin/customers`);
     if (res.ok) {
       const data = await res.json();
       allCustomers = data.customers || [];
@@ -195,7 +198,7 @@ async function fetchCustomers() {
 
 async function fetchProducts() {
   try {
-    const res = await fetch('/api/products');
+    const res = await fetch(`${API_BASE}/api/products`);
     if (res.ok) {
       const data = await res.json();
       allProducts = data.products || [];
@@ -377,7 +380,7 @@ document.getElementById('ordersListContainer')?.addEventListener('click', async 
   btn.textContent = 'Saving...';
 
   try {
-    const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+    const res = await fetch(`${API_BASE}/api/admin/orders/${orderId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, trackingNumber })
@@ -498,7 +501,7 @@ document.getElementById('adminProductsGrid')?.addEventListener('click', async (e
   if (!confirm('Are you sure you want to remove this handcrafted piece from the store catalog?')) return;
 
   try {
-    const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_BASE}/api/admin/products/${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (data.success) {
       showAdminToast('Product removed from catalog.');
@@ -553,7 +556,7 @@ if (addProductForm) {
     const description = document.getElementById('newProdDescription').value.trim();
 
     try {
-      const res = await fetch('/api/admin/products', {
+      const res = await fetch(`${API_BASE}/api/admin/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

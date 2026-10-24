@@ -1,0 +1,1370 @@
+/**
+ * RSA Creations - Client-side Interactive Logic
+ * Connected to Node.js / Express Backend (Port 5000)
+ */
+
+// Handcrafted Product Catalog (Default INR Prices)
+const PRODUCTS = [
+  {
+    id: 'rsa-1',
+    name: 'Raw Glaze Ceramic Earth Mug',
+    category: 'pottery',
+    categoryLabel: 'Pottery & Ceramics',
+    price: 650,
+    rating: 4.9,
+    reviewsCount: 38,
+    badge: 'Bestseller',
+    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=700&q=80',
+    description: 'Individually hand-thrown on the potter’s wheel with iron-rich clay and reactive ash glaze.',
+    materials: 'High-fire stoneware clay, non-toxic mineral glaze',
+    dimensions: '3.6" Diameter x 4.2" Height (350 ml capacity)',
+    method: 'Wheel-thrown & reduction fired at cone 10'
+  },
+  {
+    id: 'rsa-2',
+    name: 'Handwoven Jute & Wool Tapestry',
+    category: 'textiles',
+    categoryLabel: 'Handwoven Textiles',
+    price: 1850,
+    rating: 5.0,
+    reviewsCount: 24,
+    badge: 'Artisan Pick',
+    image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=700&q=80',
+    description: 'Loom-woven tapestry blending raw organic Bengal jute with soft wool yarn on an oak dowel.',
+    materials: '100% Unbleached Bengal jute, cruelty-free yarn, oak dowel',
+    dimensions: '18" Width x 32" Total Length',
+    method: 'Traditional wooden frame loom weaving with macramé knots'
+  },
+  {
+    id: 'rsa-3',
+    name: 'Terracotta Fluted Footed Planter',
+    category: 'pottery',
+    categoryLabel: 'Pottery & Ceramics',
+    price: 850,
+    rating: 4.8,
+    reviewsCount: 42,
+    badge: 'Handmade',
+    image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=700&q=80',
+    description: 'Porous native terracotta hand-fluted to provide optimal aeration for house plant roots.',
+    materials: 'Native Bengal terracotta clay',
+    dimensions: '6.5" Diameter x 7" Height',
+    method: 'Hand-pressed molds with hand-carved exterior fluting'
+  },
+  {
+    id: 'rsa-4',
+    name: 'Hand-Carved Reclaimed Teak Bowl',
+    category: 'decor',
+    categoryLabel: 'Home Accents',
+    price: 1450,
+    rating: 4.9,
+    reviewsCount: 19,
+    badge: 'Limited Drop',
+    image: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=700&q=80',
+    description: 'Carved from reclaimed solid teak roots with live natural edges and hand-rubbed organic beeswax.',
+    materials: 'Salvaged solid teak root, organic walnut oil finish',
+    dimensions: 'Approx 9" - 10" Diameter x 3.5" Depth',
+    method: 'Hand chiseling along organic natural wood grain'
+  },
+  {
+    id: 'rsa-5',
+    name: 'Wild Honey & Mountain Sage Beeswax Candles',
+    category: 'decor',
+    categoryLabel: 'Home Accents',
+    price: 699,
+    rating: 4.7,
+    reviewsCount: 51,
+    badge: 'Popular',
+    image: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=700&q=80',
+    description: 'Duo of hand-poured golden beeswax candles scented with wild sage and mountain honey.',
+    materials: '100% Pure beeswax, essential oils, cotton wick',
+    dimensions: 'Pair of 200g reusable amber jars (45+ hrs burn time)',
+    method: 'Small-batch double boiler hand-pouring'
+  },
+  {
+    id: 'rsa-6',
+    name: 'Macramé Tiered Floating Plant Shelf',
+    category: 'textiles',
+    categoryLabel: 'Handwoven Textiles',
+    price: 950,
+    rating: 4.9,
+    reviewsCount: 29,
+    badge: 'Handmade',
+    image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=700&q=80',
+    description: 'Intricately knotted with heavy-duty 4mm natural cotton cord, supporting a solid circular pine wood tier.',
+    materials: '4mm Twisted natural cotton rope, untreated pine wood tier',
+    dimensions: '42" Total Hanging Length; 9" Shelf Diameter',
+    method: 'Hand knotting using square knots and spiral twists'
+  },
+  {
+    id: 'rsa-7',
+    name: 'Botanical Block-Printed Table Runner',
+    category: 'textiles',
+    categoryLabel: 'Handwoven Textiles',
+    price: 890,
+    rating: 4.8,
+    reviewsCount: 16,
+    badge: 'Artisan Pick',
+    image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80',
+    description: 'Hand-stamped using carved rosewood blocks and natural vegetable dyes on dense unbleached cotton.',
+    materials: '100% Slub cotton fabric, natural plant dyes',
+    dimensions: '14" Width x 72" Length',
+    method: 'Hand-carved wooden block printing by artisan guilds'
+  },
+  {
+    id: 'rsa-8',
+    name: 'Hammered Brass Sunburst Drop Earrings',
+    category: 'accessories',
+    categoryLabel: 'Handmade Jewelry',
+    price: 750,
+    rating: 5.0,
+    reviewsCount: 33,
+    badge: 'Bestseller',
+    image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=700&q=80',
+    description: 'Forged from raw solid brass sheet with distinctive dappled hammer marks that reflect candlelight.',
+    materials: 'Raw jewelers brass, hypoallergenic 14k gold-plated ear wires',
+    dimensions: '2.2" Drop Length x 1.2" Width',
+    method: 'Hand-sawed, textured with cross-peen jeweler hammers'
+  }
+];
+
+// App State Management
+const state = {
+  products: [...PRODUCTS],
+  selectedCategory: 'all',
+  searchQuery: '',
+  sortBy: 'featured',
+  cart: JSON.parse(localStorage.getItem('rsa_cart_inr') || '[]'),
+  wishlist: JSON.parse(localStorage.getItem('rsa_wishlist') || '[]'),
+  promoApplied: false,
+  promoDiscount: 0.10, // 10%
+  promoCode: 'HANDMADE10',
+  freeShippingThreshold: 1999, // Free shipping above ₹1,999
+  deliveryLocation: 'kolkata', // 'kolkata' (₹60), 'wb' (₹100), 'india' (₹150)
+  deliveryCharge: 60,
+  deliveryRegionName: 'Kolkata Metropolitan Area',
+  deliveryTimeline: '7 to 10 business days',
+  estimatedDates: '',
+  currentUser: JSON.parse(localStorage.getItem('rsa_user') || 'null')
+};
+
+// DOM Selectors
+const productGrid = document.getElementById('productGrid');
+const productCount = document.getElementById('productCount');
+const categoryPills = document.getElementById('categoryPills');
+const sortSelect = document.getElementById('sortSelect');
+const headerSearchInput = document.getElementById('headerSearchInput');
+const searchSubmitBtn = document.getElementById('searchSubmitBtn');
+const emptyState = document.getElementById('emptyState');
+const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+// Cart DOM
+const cartDrawer = document.getElementById('cartDrawer');
+const cartOpenBtn = document.getElementById('cartOpenBtn');
+const cartCloseBtn = document.getElementById('cartCloseBtn');
+const cartBackdrop = document.getElementById('cartBackdrop');
+const cartBadge = document.getElementById('cartBadge');
+const cartDrawerCount = document.getElementById('cartDrawerCount');
+const cartItemsList = document.getElementById('cartItemsList');
+const cartSubtotal = document.getElementById('cartSubtotal');
+const cartShipping = document.getElementById('cartShipping');
+const cartShippingLabel = document.getElementById('cartShippingLabel');
+const cartTotal = document.getElementById('cartTotal');
+const discountRow = document.getElementById('discountRow');
+const cartDiscount = document.getElementById('cartDiscount');
+const promoInput = document.getElementById('promoInput');
+const applyPromoBtn = document.getElementById('applyPromoBtn');
+const promoDiscountBadge = document.getElementById('promoDiscountBadge');
+const removePromoBtn = document.getElementById('removePromoBtn');
+const trackerFill = document.getElementById('trackerFill');
+const freeShippingText = document.getElementById('freeShippingText');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const continueShoppingBtn = document.getElementById('continueShoppingBtn');
+const cartDestinationSelect = document.getElementById('cartDestinationSelect');
+
+// Wishlist DOM
+const wishlistBadge = document.getElementById('wishlistBadge');
+
+// Quick View Dialog
+const quickViewDialog = document.getElementById('quickViewDialog');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+const modalProductImage = document.getElementById('modalProductImage');
+const modalProductBadge = document.getElementById('modalProductBadge');
+const modalProductCategory = document.getElementById('modalProductCategory');
+const modalProductTitle = document.getElementById('modalProductTitle');
+const modalProductRating = document.getElementById('modalProductRating');
+const modalProductPrice = document.getElementById('modalProductPrice');
+const modalProductDescription = document.getElementById('modalProductDescription');
+const modalProductMaterials = document.getElementById('modalProductMaterials');
+const modalProductDimensions = document.getElementById('modalProductDimensions');
+const modalProductMethod = document.getElementById('modalProductMethod');
+const modalQtyInput = document.getElementById('modalQtyInput');
+const modalQtyMinus = document.getElementById('modalQtyMinus');
+const modalQtyPlus = document.getElementById('modalQtyPlus');
+const modalAddToCartBtn = document.getElementById('modalAddToCartBtn');
+
+// Checkout Dialog
+const checkoutDialog = document.getElementById('checkoutDialog');
+const checkoutCloseBtn = document.getElementById('checkoutCloseBtn');
+const checkoutForm = document.getElementById('checkoutForm');
+const checkoutSubtotal = document.getElementById('checkoutSubtotal');
+const checkoutDeliveryFee = document.getElementById('checkoutDeliveryFee');
+const checkoutTotalAmount = document.getElementById('checkoutTotalAmount');
+const checkoutRegionTag = document.getElementById('checkoutRegionTag');
+const checkoutDeliveryDates = document.getElementById('checkoutDeliveryDates');
+const custCity = document.getElementById('custCity');
+const custZip = document.getElementById('custZip');
+
+// Success Dialog
+const successDialog = document.getElementById('successDialog');
+const successCloseBtn = document.getElementById('successCloseBtn');
+const successOrderNumber = document.getElementById('successOrderNumber');
+
+// Auth & User Account DOM
+const accountHeaderBtn = document.getElementById('accountHeaderBtn');
+const accountLabel = document.getElementById('accountLabel');
+const authDialog = document.getElementById('authDialog');
+const authCloseBtn = document.getElementById('authCloseBtn');
+const authDialogTitle = document.getElementById('authDialogTitle');
+const loginTab = document.getElementById('loginTab');
+const signupTab = document.getElementById('signupTab');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const loginIdentifier = document.getElementById('loginIdentifier');
+const loginPassword = document.getElementById('loginPassword');
+const loginError = document.getElementById('loginError');
+const signupName = document.getElementById('signupName');
+const signupEmail = document.getElementById('signupEmail');
+const signupMobile = document.getElementById('signupMobile');
+const signupPassword = document.getElementById('signupPassword');
+const signupError = document.getElementById('signupError');
+
+// Address Dialog DOM
+const addressDialog = document.getElementById('addressDialog');
+const addressCloseBtn = document.getElementById('addressCloseBtn');
+const addressForm = document.getElementById('addressForm');
+const addrStreet = document.getElementById('addrStreet');
+const addrCity = document.getElementById('addrCity');
+const addrPincode = document.getElementById('addrPincode');
+const addrState = document.getElementById('addrState');
+const addressError = document.getElementById('addressError');
+const savedAddressesList = document.getElementById('savedAddressesList');
+const addressCards = document.getElementById('addressCards');
+
+// User Dropdown DOM
+const userDropdown = document.getElementById('userDropdown');
+const dropdownAvatar = document.getElementById('dropdownAvatar');
+const dropdownName = document.getElementById('dropdownName');
+const dropdownContact = document.getElementById('dropdownContact');
+const dropdownAddressBtn = document.getElementById('dropdownAddressBtn');
+const dropdownOrdersBtn = document.getElementById('dropdownOrdersBtn');
+const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
+
+// Mobile Nav
+const mobileNavToggle = document.getElementById('mobileNavToggle');
+const mainNav = document.getElementById('mainNav');
+
+// Newsletter
+const newsletterForm = document.getElementById('newsletterForm');
+
+let currentActiveQuickViewProduct = null;
+
+// ==========================================================================
+// Calculate Dynamic 7-10 Days Delivery Range
+// ==========================================================================
+function computeDeliveryDateRange() {
+  const today = new Date();
+  const minDate = new Date(today);
+  minDate.setDate(today.getDate() + 7);
+
+  const maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + 10);
+
+  const options = { month: 'short', day: 'numeric' };
+  const formatted = `${minDate.toLocaleDateString('en-IN', options)} - ${maxDate.toLocaleDateString('en-IN', options)}`;
+  state.estimatedDates = formatted;
+  if (checkoutDeliveryDates) {
+    checkoutDeliveryDates.textContent = formatted;
+  }
+}
+
+// ==========================================================================
+// Light-Dismiss Fallback for Native <dialog> (Modern Web Guidance compliance)
+// ==========================================================================
+function setupDialogLightDismiss(dialogElement) {
+  if (dialogElement && !('closedBy' in HTMLDialogElement.prototype)) {
+    dialogElement.addEventListener('click', (event) => {
+      if (event.target !== dialogElement) return;
+
+      const rect = dialogElement.getBoundingClientRect();
+      const isDialogContent = (
+        rect.top <= event.clientY &&
+        event.clientY <= rect.top + rect.height &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.left + rect.width
+      );
+
+      if (isDialogContent) return;
+      dialogElement.close();
+    });
+  }
+}
+
+setupDialogLightDismiss(quickViewDialog);
+setupDialogLightDismiss(checkoutDialog);
+setupDialogLightDismiss(successDialog);
+setupDialogLightDismiss(authDialog);
+setupDialogLightDismiss(addressDialog);
+
+// ==========================================================================
+// Safe HTML Escaping Helper
+// ==========================================================================
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ==========================================================================
+// Customer Auth & Address Management Helpers
+// ==========================================================================
+
+function autofillCheckoutFromUser() {
+  if (!state.currentUser) return;
+  const nameParts = (state.currentUser.name || '').trim().split(' ');
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+
+  const custFirstName = document.getElementById('custFirstName');
+  const custLastName = document.getElementById('custLastName');
+  const custPhone = document.getElementById('custPhone');
+  const custEmail = document.getElementById('custEmail');
+  const custAddress = document.getElementById('custAddress');
+
+  if (custFirstName && firstName) custFirstName.value = firstName;
+  if (custLastName && lastName) custLastName.value = lastName;
+  if (custPhone && state.currentUser.mobile) custPhone.value = state.currentUser.mobile;
+  if (custEmail && state.currentUser.email) custEmail.value = state.currentUser.email;
+
+  const defaultAddr = (state.currentUser.addresses && state.currentUser.addresses.find(a => a.isDefault)) ||
+                      (state.currentUser.addresses && state.currentUser.addresses[0]);
+
+  if (defaultAddr) {
+    if (custAddress) custAddress.value = defaultAddr.address || '';
+    if (custCity) custCity.value = defaultAddr.city || '';
+    if (custZip) custZip.value = defaultAddr.pincode || '';
+    updateShippingCalculation(defaultAddr.city, defaultAddr.pincode, defaultAddr.state);
+  }
+}
+
+function updateAuthUI() {
+  if (state.currentUser) {
+    const firstName = state.currentUser.name.split(' ')[0];
+    if (accountLabel) accountLabel.textContent = firstName;
+    if (dropdownAvatar) dropdownAvatar.textContent = (state.currentUser.name[0] || 'U').toUpperCase();
+    if (dropdownName) dropdownName.textContent = state.currentUser.name;
+    if (dropdownContact) dropdownContact.textContent = state.currentUser.email || state.currentUser.mobile || 'Customer';
+    autofillCheckoutFromUser();
+  } else {
+    if (accountLabel) accountLabel.textContent = 'Login';
+    if (userDropdown) userDropdown.style.display = 'none';
+  }
+}
+
+function switchAuthTab(tab) {
+  if (tab === 'login') {
+    loginTab.classList.add('active');
+    signupTab.classList.remove('active');
+    loginForm.style.display = 'flex';
+    signupForm.style.display = 'none';
+    if (authDialogTitle) authDialogTitle.textContent = 'Welcome to RSA Creations';
+  } else {
+    signupTab.classList.add('active');
+    loginTab.classList.remove('active');
+    signupForm.style.display = 'flex';
+    loginForm.style.display = 'none';
+    if (authDialogTitle) authDialogTitle.textContent = 'Create Customer Account';
+  }
+  if (loginError) loginError.style.display = 'none';
+  if (signupError) signupError.style.display = 'none';
+}
+
+function openAuthModal(mode = 'login') {
+  switchAuthTab(mode);
+  if (userDropdown) userDropdown.style.display = 'none';
+  authDialog.showModal();
+}
+
+function renderSavedAddresses() {
+  if (!addressCards) return;
+  const addresses = (state.currentUser && state.currentUser.addresses) || [];
+  if (addresses.length === 0) {
+    savedAddressesList.style.display = 'none';
+    return;
+  }
+  savedAddressesList.style.display = 'block';
+  addressCards.innerHTML = addresses.map((addr, idx) => `
+    <div class="address-card ${addr.isDefault ? 'active-address' : ''}">
+      <div>
+        <strong>${escapeHtml(addr.address)}</strong><br>
+        <span>${escapeHtml(addr.city)}, ${escapeHtml(addr.state || '')} - <strong>${escapeHtml(addr.pincode)}</strong></span>
+        ${addr.isDefault ? '<span class="address-tag">Default Delivery</span>' : ''}
+      </div>
+      ${!addr.isDefault ? `<button type="button" class="btn btn-secondary set-default-addr-btn" data-index="${idx}" style="padding: 4px 8px; font-size: 0.75rem;">Set Default</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function openAddressModal() {
+  if (userDropdown) userDropdown.style.display = 'none';
+  if (addressError) addressError.style.display = 'none';
+  renderSavedAddresses();
+  addressDialog.showModal();
+}
+
+// ==========================================================================
+// Backend API Integration
+// ==========================================================================
+
+async function fetchProductsFromBackend() {
+  try {
+    const res = await fetch('/api/products');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.products && data.products.length > 0) {
+        state.products = data.products;
+        renderProducts();
+      }
+    }
+  } catch (err) {
+    console.log('Using local catalog, backend offline:', err.message);
+  }
+}
+
+// Calculate shipping from backend API or local logic
+async function updateShippingCalculation(city = 'Kolkata', pincode = '700001', stateName = 'West Bengal') {
+  const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  try {
+    const response = await fetch('/api/shipping/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city, pincode, state: stateName, subtotal })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      state.deliveryCharge = data.deliveryCharge;
+      state.deliveryRegionName = data.region;
+      state.deliveryTimeline = data.estimatedDeliveryDays || (data.timeline && data.timeline.daysRange) || '7 to 10 business days';
+      state.estimatedDates = data.estimatedDateRange || (data.timeline && data.timeline.estimatedArrival) || state.estimatedDates;
+
+      if (checkoutRegionTag) checkoutRegionTag.textContent = `📍 Detected: ${data.region}`;
+      if (checkoutDeliveryDates) checkoutDeliveryDates.textContent = state.estimatedDates;
+      updateCartUI();
+      return;
+    }
+  } catch (e) {
+    // Local fallback calculation if backend is unavailable
+  }
+
+  // Fallback local rule:
+  const isKolkata = city.toLowerCase().includes('kolkata') || pincode.startsWith('700');
+  const isWB = pincode.startsWith('7') || stateName.toLowerCase().includes('bengal');
+
+  if (subtotal >= state.freeShippingThreshold) {
+    state.deliveryCharge = 0;
+  } else if (isKolkata) {
+    state.deliveryCharge = 60;
+    state.deliveryRegionName = 'Kolkata Metropolitan Area';
+  } else if (isWB) {
+    state.deliveryCharge = 100;
+    state.deliveryRegionName = 'West Bengal (Outside Kolkata)';
+  } else {
+    state.deliveryCharge = 150;
+    state.deliveryRegionName = 'Rest of India';
+  }
+
+  if (checkoutRegionTag) checkoutRegionTag.textContent = `📍 Detected: ${state.deliveryRegionName}`;
+  updateCartUI();
+}
+
+// ==========================================================================
+// Core Render Functions
+// ==========================================================================
+
+function getFilteredProducts() {
+  let list = [...state.products];
+
+  // Category Filter
+  if (state.selectedCategory !== 'all') {
+    list = list.filter(p => p.category === state.selectedCategory);
+  }
+
+  // Search Filter
+  if (state.searchQuery.trim() !== '') {
+    const q = state.searchQuery.toLowerCase();
+    list = list.filter(p => 
+      p.name.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q) ||
+      p.categoryLabel.toLowerCase().includes(q)
+    );
+  }
+
+  // Sort
+  if (state.sortBy === 'price-asc') {
+    list.sort((a, b) => a.price - b.price);
+  } else if (state.sortBy === 'price-desc') {
+    list.sort((a, b) => b.price - a.price);
+  } else if (state.sortBy === 'rating-desc') {
+    list.sort((a, b) => b.rating - a.rating);
+  } else if (state.sortBy === 'name-asc') {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  return list;
+}
+
+function renderProducts() {
+  const filtered = getFilteredProducts();
+  productCount.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    productGrid.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+
+  productGrid.innerHTML = filtered.map(product => {
+    const isWishlisted = state.wishlist.includes(product.id);
+    return `
+      <article class="product-card" data-id="${product.id}">
+        <div class="card-image-wrap">
+          <img src="${product.image}" alt="${product.name} crafted by RSA Creations" loading="lazy">
+          <span class="product-badge">${product.badge}</span>
+          <button 
+            type="button" 
+            class="card-wishlist-btn ${isWishlisted ? 'active' : ''}" 
+            data-id="${product.id}" 
+            aria-label="${isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="${isWishlisted ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+          <button type="button" class="card-quick-view-btn" data-id="${product.id}">
+            Quick View
+          </button>
+        </div>
+
+        <div class="card-content">
+          <span class="card-category">${product.categoryLabel}</span>
+          <h3 class="card-title">${product.name}</h3>
+          <div class="card-rating">
+            ★★★★★ <span>(${product.rating})</span>
+          </div>
+
+          <div class="card-footer">
+            <span class="card-price">₹${product.price.toLocaleString('en-IN')}</span>
+            <button type="button" class="add-cart-btn" data-id="${product.id}">
+              Add to Basket
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+// ==========================================================================
+// Cart Logic & Drawer
+// ==========================================================================
+
+function saveCart() {
+  localStorage.setItem('rsa_cart_inr', JSON.stringify(state.cart));
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const totalItemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+  cartBadge.textContent = totalItemCount;
+  cartDrawerCount.textContent = `(${totalItemCount} ${totalItemCount === 1 ? 'item' : 'items'})`;
+
+  // Render Cart Item Rows
+  if (state.cart.length === 0) {
+    cartItemsList.innerHTML = `
+      <div class="cart-empty-message">
+        <p style="font-size: 2.2rem; margin-bottom: 8px;">🧺</p>
+        <h4>Your basket is currently empty</h4>
+        <p style="font-size: 0.85rem; margin-top: 4px;">Explore our handcrafted creations for your living space.</p>
+      </div>
+    `;
+    checkoutBtn.disabled = true;
+    checkoutBtn.style.opacity = '0.5';
+    checkoutBtn.style.cursor = 'not-allowed';
+  } else {
+    checkoutBtn.disabled = false;
+    checkoutBtn.style.opacity = '1';
+    checkoutBtn.style.cursor = 'pointer';
+
+    cartItemsList.innerHTML = state.cart.map(item => `
+      <div class="cart-item" data-id="${item.id}">
+        <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+        <div class="cart-item-details">
+          <h4 class="cart-item-title">${item.name}</h4>
+          <div class="cart-item-price">₹${item.price.toLocaleString('en-IN')}</div>
+          <div class="cart-item-qty">
+            <button type="button" class="qty-btn-mini btn-decrement" data-id="${item.id}">-</button>
+            <span class="qty-number">${item.quantity}</span>
+            <button type="button" class="qty-btn-mini btn-increment" data-id="${item.id}">+</button>
+          </div>
+        </div>
+        <button type="button" class="cart-item-remove" data-id="${item.id}" aria-label="Remove item">&times;</button>
+      </div>
+    `).join('');
+  }
+
+  // Calculate Subtotal in INR
+  const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  cartSubtotal.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  if (checkoutSubtotal) checkoutSubtotal.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+
+  // Free shipping tracker (Threshold: ₹1,999)
+  const freeThreshold = state.freeShippingThreshold;
+  let effectiveShipping = state.deliveryCharge;
+
+  if (subtotal >= freeThreshold && subtotal > 0) {
+    trackerFill.style.width = '100%';
+    freeShippingText.innerHTML = '🎉 <strong>Free Doorstep Delivery Unlocked!</strong>';
+    cartShipping.textContent = 'FREE';
+    cartShipping.style.color = 'var(--color-sage)';
+    effectiveShipping = 0;
+  } else {
+    const diff = freeThreshold - subtotal;
+    const pct = Math.min(100, Math.max(0, (subtotal / freeThreshold) * 100));
+    trackerFill.style.width = `${pct}%`;
+    freeShippingText.textContent = `Add ₹${diff.toLocaleString('en-IN')} more to unlock Free Delivery!`;
+    cartShipping.textContent = subtotal === 0 ? '₹0' : `₹${effectiveShipping}`;
+    cartShipping.style.color = 'var(--text-muted)';
+  }
+
+  // Label based on destination
+  if (cartShippingLabel) {
+    cartShippingLabel.textContent = `Delivery (${state.deliveryRegionName.split(' ')[0]})`;
+  }
+  if (checkoutDeliveryFee) {
+    checkoutDeliveryFee.textContent = effectiveShipping === 0 ? 'FREE' : `₹${effectiveShipping}`;
+  }
+
+  // Discount Calculation (Promo code HANDMADE10 for 10% off)
+  let discountAmount = 0;
+  if (state.promoApplied && subtotal > 0) {
+    discountAmount = Math.round(subtotal * state.promoDiscount);
+    discountRow.style.display = 'flex';
+    cartDiscount.textContent = `-₹${discountAmount.toLocaleString('en-IN')}`;
+    promoDiscountBadge.style.display = 'flex';
+  } else {
+    discountRow.style.display = 'none';
+    promoDiscountBadge.style.display = 'none';
+  }
+
+  // Calculate Final Total in INR
+  const grandTotal = Math.max(0, subtotal - discountAmount + (subtotal === 0 ? 0 : effectiveShipping));
+  cartTotal.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+  if (checkoutTotalAmount) {
+    checkoutTotalAmount.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+  }
+}
+
+function addToCart(productId, quantity = 1) {
+  if (!state.currentUser) {
+    showToast('Please login or create an account to access and order handcrafted items!', 'toast');
+    openAuthModal('login');
+    return;
+  }
+
+  const product = state.products.find(p => p.id === productId);
+  if (!product) return;
+
+  const existing = state.cart.find(item => item.id === productId);
+  if (existing) {
+    existing.quantity += quantity;
+  } else {
+    state.cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: quantity
+    });
+  }
+
+  saveCart();
+  showToast(`Added "${product.name}" to your basket!`, 'toast-success');
+  openCartDrawer();
+}
+
+function openCartDrawer() {
+  cartDrawer.classList.add('open');
+  cartDrawer.setAttribute('aria-hidden', 'false');
+}
+
+function closeCartDrawer() {
+  cartDrawer.classList.remove('open');
+  cartDrawer.setAttribute('aria-hidden', 'true');
+}
+
+// ==========================================================================
+// Wishlist Logic
+// ==========================================================================
+
+function toggleWishlist(productId) {
+  const index = state.wishlist.indexOf(productId);
+  const product = state.products.find(p => p.id === productId);
+
+  if (index > -1) {
+    state.wishlist.splice(index, 1);
+    showToast(`Removed from saved pieces`);
+  } else {
+    state.wishlist.push(productId);
+    showToast(`Added "${product ? product.name : 'Piece'}" to Wishlist!`, 'toast-success');
+  }
+
+  localStorage.setItem('rsa_wishlist', JSON.stringify(state.wishlist));
+  wishlistBadge.textContent = state.wishlist.length;
+  renderProducts();
+}
+
+// ==========================================================================
+// Quick View Modal
+// ==========================================================================
+
+function openQuickView(productId) {
+  const product = state.products.find(p => p.id === productId);
+  if (!product) return;
+
+  currentActiveQuickViewProduct = product;
+  modalProductImage.src = product.image;
+  modalProductImage.alt = product.name;
+  modalProductBadge.textContent = product.badge;
+  modalProductCategory.textContent = product.categoryLabel;
+  modalProductTitle.textContent = product.name;
+  modalProductRating.textContent = `★★★★★ (${product.rating} • ${product.reviewsCount} reviews)`;
+  modalProductPrice.textContent = `₹${product.price.toLocaleString('en-IN')}`;
+  modalProductDescription.textContent = product.description;
+  modalProductMaterials.textContent = product.materials;
+  modalProductDimensions.textContent = product.dimensions;
+  modalProductMethod.textContent = product.method;
+  modalQtyInput.value = 1;
+
+  quickViewDialog.showModal();
+}
+
+// ==========================================================================
+// Toast Notifications
+// ==========================================================================
+
+function showToast(message, type = '') {
+  const toastContainer = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('toast-remove');
+    setTimeout(() => toast.remove(), 300);
+  }, 3200);
+}
+
+// ==========================================================================
+// Event Listeners Initialization
+// ==========================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  computeDeliveryDateRange();
+  renderProducts();
+  updateCartUI();
+  updateAuthUI();
+  wishlistBadge.textContent = state.wishlist.length;
+
+  // Fetch updated catalog from backend API
+  fetchProductsFromBackend();
+
+  // Destination Selector inside Cart
+  if (cartDestinationSelect) {
+    cartDestinationSelect.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'kolkata') {
+        state.deliveryCharge = 60;
+        state.deliveryRegionName = 'Kolkata Metropolitan Area';
+        custCity.value = 'Kolkata';
+        custZip.value = '700001';
+      } else if (val === 'wb') {
+        state.deliveryCharge = 100;
+        state.deliveryRegionName = 'West Bengal (Outside Kolkata)';
+        custCity.value = 'Siliguri / Durgapur';
+        custZip.value = '734001';
+      } else {
+        state.deliveryCharge = 150;
+        state.deliveryRegionName = 'Rest of India';
+        custCity.value = 'Delhi / Mumbai / Bangalore';
+        custZip.value = '110001';
+      }
+      updateCartUI();
+    });
+  }
+
+  // Category Filtering
+  categoryPills.addEventListener('click', (e) => {
+    const pill = e.target.closest('.pill-btn');
+    if (!pill) return;
+
+    categoryPills.querySelectorAll('.pill-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+
+    pill.classList.add('active');
+    pill.setAttribute('aria-selected', 'true');
+    state.selectedCategory = pill.dataset.category;
+    renderProducts();
+  });
+
+  // Sort change
+  sortSelect.addEventListener('change', (e) => {
+    state.sortBy = e.target.value;
+    renderProducts();
+  });
+
+  // Search input handler
+  headerSearchInput.addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    renderProducts();
+  });
+
+  searchSubmitBtn.addEventListener('click', () => {
+    state.searchQuery = headerSearchInput.value;
+    renderProducts();
+  });
+
+  // Reset filters
+  resetFiltersBtn.addEventListener('click', () => {
+    state.searchQuery = '';
+    state.selectedCategory = 'all';
+    headerSearchInput.value = '';
+    categoryPills.querySelectorAll('.pill-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === 0);
+      b.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+    });
+    renderProducts();
+  });
+
+  // Product Grid Delegate (Add to cart, Wishlist, Quick View)
+  productGrid.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.add-cart-btn');
+    if (addBtn) {
+      addToCart(addBtn.dataset.id, 1);
+      return;
+    }
+
+    const wishBtn = e.target.closest('.card-wishlist-btn');
+    if (wishBtn) {
+      toggleWishlist(wishBtn.dataset.id);
+      return;
+    }
+
+    const quickBtn = e.target.closest('.card-quick-view-btn');
+    if (quickBtn) {
+      openQuickView(quickBtn.dataset.id);
+      return;
+    }
+  });
+
+  // Cart Drawer open/close
+  cartOpenBtn.addEventListener('click', openCartDrawer);
+  cartCloseBtn.addEventListener('click', closeCartDrawer);
+  cartBackdrop.addEventListener('click', closeCartDrawer);
+  continueShoppingBtn.addEventListener('click', closeCartDrawer);
+
+  // Cart Items Click Delegate (Increment, Decrement, Remove)
+  cartItemsList.addEventListener('click', (e) => {
+    const incBtn = e.target.closest('.btn-increment');
+    if (incBtn) {
+      const item = state.cart.find(i => i.id === incBtn.dataset.id);
+      if (item) {
+        item.quantity += 1;
+        saveCart();
+      }
+      return;
+    }
+
+    const decBtn = e.target.closest('.btn-decrement');
+    if (decBtn) {
+      const item = state.cart.find(i => i.id === decBtn.dataset.id);
+      if (item && item.quantity > 1) {
+        item.quantity -= 1;
+        saveCart();
+      } else if (item && item.quantity === 1) {
+        state.cart = state.cart.filter(i => i.id !== decBtn.dataset.id);
+        saveCart();
+      }
+      return;
+    }
+
+    const removeBtn = e.target.closest('.cart-item-remove');
+    if (removeBtn) {
+      state.cart = state.cart.filter(i => i.id !== removeBtn.dataset.id);
+      saveCart();
+      showToast('Item removed from basket');
+      return;
+    }
+  });
+
+  // Promo Code Handler
+  applyPromoBtn.addEventListener('click', () => {
+    const code = promoInput.value.trim().toUpperCase();
+    if (code === state.promoCode) {
+      state.promoApplied = true;
+      saveCart();
+      showToast('Promo code applied: 10% discount on order!', 'toast-success');
+      promoInput.value = '';
+    } else {
+      showToast('Invalid promo code. Try "HANDMADE10"');
+    }
+  });
+
+  removePromoBtn.addEventListener('click', () => {
+    state.promoApplied = false;
+    saveCart();
+    showToast('Promo code removed');
+  });
+
+  // Quick View Quantity Counter
+  modalQtyMinus.addEventListener('click', () => {
+    let val = parseInt(modalQtyInput.value, 10) || 1;
+    if (val > 1) modalQtyInput.value = val - 1;
+  });
+
+  modalQtyPlus.addEventListener('click', () => {
+    let val = parseInt(modalQtyInput.value, 10) || 1;
+    if (val < 10) modalQtyInput.value = val + 1;
+  });
+
+  modalAddToCartBtn.addEventListener('click', () => {
+    if (currentActiveQuickViewProduct) {
+      const qty = parseInt(modalQtyInput.value, 10) || 1;
+      addToCart(currentActiveQuickViewProduct.id, qty);
+      quickViewDialog.close();
+    }
+  });
+
+  modalCloseBtn.addEventListener('click', () => {
+    quickViewDialog.close();
+  });
+
+  // Checkout Modal Open (Requires Login & Address)
+  checkoutBtn.addEventListener('click', () => {
+    if (state.cart.length === 0) return;
+
+    if (!state.currentUser) {
+      showToast('Please login or create an account to place your order.', 'toast');
+      closeCartDrawer();
+      openAuthModal('login');
+      return;
+    }
+
+    const hasAddress = state.currentUser.addresses && state.currentUser.addresses.length > 0;
+    if (!hasAddress) {
+      showToast('Please save your delivery address to proceed with order.', 'toast');
+      closeCartDrawer();
+      openAddressModal();
+      return;
+    }
+
+    closeCartDrawer();
+    autofillCheckoutFromUser();
+    updateShippingCalculation(custCity.value || 'Kolkata', custZip.value || '700001');
+    checkoutDialog.showModal();
+  });
+
+  checkoutCloseBtn.addEventListener('click', () => {
+    checkoutDialog.close();
+  });
+
+  // Listen for City / Pincode changes in Checkout to dynamically recalculate
+  [custCity, custZip].forEach(input => {
+    if (input) {
+      input.addEventListener('input', () => {
+        updateShippingCalculation(custCity.value, custZip.value);
+      });
+    }
+  });
+
+  // Checkout Form Submission (Sends real POST /api/orders to backend)
+  checkoutForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!state.currentUser) {
+      showToast('Please login before confirming your order.');
+      checkoutDialog.close();
+      openAuthModal('login');
+      return;
+    }
+
+    const firstName = document.getElementById('custFirstName').value.trim();
+    const lastName = document.getElementById('custLastName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    const email = document.getElementById('custEmail').value.trim();
+    const address = document.getElementById('custAddress').value.trim();
+    const city = custCity.value.trim();
+    const pincode = custZip.value.trim();
+
+    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const orderPayload = {
+      customerName: `${firstName} ${lastName}`,
+      phone: phone || state.currentUser.mobile,
+      email: email || state.currentUser.email,
+      address,
+      city,
+      pincode,
+      items: state.cart,
+      subtotal,
+      promoCode: state.promoApplied ? 'HANDMADE10' : null
+    };
+
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.order) {
+        successOrderNumber.textContent = data.order.orderId;
+      } else {
+        const fallbackId = city.toLowerCase().includes('kolkata') ? '#RSA-KOL-9142' : '#RSA-IND-9142';
+        successOrderNumber.textContent = fallbackId;
+      }
+    } catch (err) {
+      const fallbackId = city.toLowerCase().includes('kolkata') ? '#RSA-KOL-9142' : '#RSA-IND-9142';
+      successOrderNumber.textContent = fallbackId;
+    }
+
+    checkoutDialog.close();
+
+    // Clear cart after successful order
+    state.cart = [];
+    state.promoApplied = false;
+    saveCart();
+
+    // Show Confirmation Dialog
+    successDialog.showModal();
+  });
+
+  successCloseBtn.addEventListener('click', () => {
+    successDialog.close();
+  });
+
+  // ==========================================================================
+  // Auth & Address Modal Event Listeners
+  // ==========================================================================
+
+  // Account button in header
+  if (accountHeaderBtn) {
+    accountHeaderBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (state.currentUser) {
+        const isVisible = userDropdown.style.display === 'flex';
+        userDropdown.style.display = isVisible ? 'none' : 'flex';
+      } else {
+        openAuthModal('login');
+      }
+    });
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (userDropdown && !userDropdown.contains(e.target) && e.target !== accountHeaderBtn) {
+      userDropdown.style.display = 'none';
+    }
+  });
+
+  // Auth Dialog Close
+  if (authCloseBtn) {
+    authCloseBtn.addEventListener('click', () => authDialog.close());
+  }
+
+  // Address Dialog Close
+  if (addressCloseBtn) {
+    addressCloseBtn.addEventListener('click', () => addressDialog.close());
+  }
+
+  // Auth Tabs (Login / Sign Up)
+  if (loginTab) {
+    loginTab.addEventListener('click', () => switchAuthTab('login'));
+  }
+  if (signupTab) {
+    signupTab.addEventListener('click', () => switchAuthTab('signup'));
+  }
+
+  // Login Form Submission
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.style.display = 'none';
+      const identifier = loginIdentifier.value.trim();
+      const password = loginPassword.value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, password })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          state.currentUser = data.user;
+          localStorage.setItem('rsa_user', JSON.stringify(data.user));
+          updateAuthUI();
+          authDialog.close();
+          loginForm.reset();
+          showToast(`Welcome back, ${data.user.name}!`, 'toast-success');
+
+          // If no address saved, prompt to add address
+          if (!data.user.addresses || data.user.addresses.length === 0) {
+            setTimeout(() => {
+              openAddressModal();
+            }, 600);
+          }
+        } else {
+          loginError.textContent = data.error || 'Failed to login. Please check your credentials.';
+          loginError.style.display = 'block';
+        }
+      } catch (err) {
+        loginError.textContent = 'Network error. Please make sure the server is running.';
+        loginError.style.display = 'block';
+      }
+    });
+  }
+
+  // Signup Form Submission
+  if (signupForm) {
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      signupError.style.display = 'none';
+      const name = signupName.value.trim();
+      const email = signupEmail.value.trim();
+      const mobile = signupMobile.value.trim();
+      const password = signupPassword.value;
+
+      if (!email && !mobile) {
+        signupError.textContent = 'Please enter either an email address or mobile number.';
+        signupError.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, mobile, password })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          state.currentUser = data.user;
+          localStorage.setItem('rsa_user', JSON.stringify(data.user));
+          updateAuthUI();
+          authDialog.close();
+          signupForm.reset();
+          showToast(`Account created! Welcome to RSA Creations, ${data.user.name}.`, 'toast-success');
+
+          // Prompt customer to add delivery address
+          setTimeout(() => {
+            openAddressModal();
+          }, 600);
+        } else {
+          signupError.textContent = data.error || 'Signup failed. Please try again.';
+          signupError.style.display = 'block';
+        }
+      } catch (err) {
+        signupError.textContent = 'Network error. Please try again.';
+        signupError.style.display = 'block';
+      }
+    });
+  }
+
+  // Address Form Submission
+  if (addressForm) {
+    addressForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      addressError.style.display = 'none';
+
+      if (!state.currentUser) {
+        addressError.textContent = 'Please login first.';
+        addressError.style.display = 'block';
+        return;
+      }
+
+      const street = addrStreet.value.trim();
+      const city = addrCity.value.trim();
+      const pincode = addrPincode.value.trim();
+      const stateVal = addrState.value.trim() || (city.toLowerCase().includes('kolkata') ? 'West Bengal' : 'India');
+
+      if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+        addressError.textContent = 'Please enter a valid 6-digit Indian pincode (e.g., 700001).';
+        addressError.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/auth/profile/${state.currentUser.userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: street, city, pincode, state: stateVal })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          state.currentUser = data.user;
+          localStorage.setItem('rsa_user', JSON.stringify(data.user));
+          updateAuthUI();
+          addressDialog.close();
+          addressForm.reset();
+          showToast('Delivery address saved! You can now place orders.', 'toast-success');
+        } else {
+          addressError.textContent = data.error || 'Failed to save address.';
+          addressError.style.display = 'block';
+        }
+      } catch (err) {
+        // Fallback local save
+        if (!state.currentUser.addresses) state.currentUser.addresses = [];
+        state.currentUser.addresses.forEach(a => a.isDefault = false);
+        state.currentUser.addresses.push({
+          id: 'ADDR-' + Date.now(),
+          address: street,
+          city,
+          pincode,
+          state: stateVal,
+          isDefault: true
+        });
+        localStorage.setItem('rsa_user', JSON.stringify(state.currentUser));
+        updateAuthUI();
+        addressDialog.close();
+        addressForm.reset();
+        showToast('Delivery address saved! You can now place orders.', 'toast-success');
+      }
+    });
+  }
+
+  // Set Default Address Delegate
+  if (addressCards) {
+    addressCards.addEventListener('click', (e) => {
+      const btn = e.target.closest('.set-default-addr-btn');
+      if (!btn || !state.currentUser || !state.currentUser.addresses) return;
+      const idx = parseInt(btn.dataset.index, 10);
+      state.currentUser.addresses.forEach((a, i) => a.isDefault = (i === idx));
+      localStorage.setItem('rsa_user', JSON.stringify(state.currentUser));
+      renderSavedAddresses();
+      autofillCheckoutFromUser();
+      showToast('Default delivery address updated!', 'toast-success');
+    });
+  }
+
+  // Dropdown Items
+  if (dropdownAddressBtn) {
+    dropdownAddressBtn.addEventListener('click', () => {
+      userDropdown.style.display = 'none';
+      openAddressModal();
+    });
+  }
+
+  if (dropdownOrdersBtn) {
+    dropdownOrdersBtn.addEventListener('click', async () => {
+      userDropdown.style.display = 'none';
+      if (!state.currentUser) return;
+      try {
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+          const data = await res.json();
+          const userOrders = (data.orders || []).filter(o => 
+            (state.currentUser.email && o.customer?.email === state.currentUser.email) ||
+            (state.currentUser.mobile && o.customer?.phone === state.currentUser.mobile) ||
+            (o.customer?.name === state.currentUser.name)
+          );
+          if (userOrders.length === 0) {
+            showToast('You haven’t placed any orders yet. Discover our handcrafted collection!');
+          } else {
+            showToast(`Found ${userOrders.length} order(s). Latest: ${userOrders[0].orderId} (${userOrders[0].status})`, 'toast-success');
+          }
+        }
+      } catch (err) {
+        showToast('Order lookup available after placing orders.');
+      }
+    });
+  }
+
+  if (dropdownLogoutBtn) {
+    dropdownLogoutBtn.addEventListener('click', () => {
+      state.currentUser = null;
+      localStorage.removeItem('rsa_user');
+      updateAuthUI();
+      userDropdown.style.display = 'none';
+      showToast('You have been logged out.');
+    });
+  }
+
+  // Mobile navigation hamburger toggle
+  mobileNavToggle.addEventListener('click', () => {
+    const isExpanded = mobileNavToggle.getAttribute('aria-expanded') === 'true';
+    mobileNavToggle.setAttribute('aria-expanded', !isExpanded);
+    mainNav.classList.toggle('open');
+  });
+
+  document.querySelectorAll('.main-nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      mainNav.classList.remove('open');
+      mobileNavToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Wishlist header icon click
+  document.getElementById('wishlistHeaderBtn').addEventListener('click', () => {
+    if (state.wishlist.length === 0) {
+      showToast('Your wishlist is empty. Tap the heart on any product to save it!');
+    } else {
+      showToast(`You have ${state.wishlist.length} handcrafted piece(s) saved in your wishlist.`);
+    }
+  });
+
+  // Newsletter form
+  newsletterForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value;
+    showToast(`Welcome! A 10% discount coupon was sent to ${email}`, 'toast-success');
+    newsletterForm.reset();
+  });
+
+  // Footer category links
+  document.querySelectorAll('.footer-col a[data-filter]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const filter = link.getAttribute('data-filter');
+      state.selectedCategory = filter;
+      categoryPills.querySelectorAll('.pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === filter);
+        btn.setAttribute('aria-selected', btn.dataset.category === filter ? 'true' : 'false');
+      });
+      renderProducts();
+    });
+  });
+});

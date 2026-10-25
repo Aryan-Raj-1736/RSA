@@ -498,26 +498,37 @@
       <button class="dialog-close-btn" id="checkoutCloseBtn" aria-label="Close checkout">&times;</button>
       <div class="checkout-header">
         <span class="logo-mark">RSA</span>
-        <h2 id="checkoutTitle">Checkout & Tracked Delivery</h2>
+        <h2 id="checkoutTitle">Checkout & Confirm Order</h2>
         <p>Doorstep delivery across Kolkata (₹60) and All India (₹100–₹150). Free above ₹1,999.</p>
+      </div>
+
+      <!-- Quick Cart Items Review in Checkout -->
+      <div class="checkout-items-review">
+        <div class="review-items-header">
+          <h4>📦 Order Summary</h4>
+          <span id="checkoutItemsCount" class="items-count-badge">0 items</span>
+        </div>
+        <div class="checkout-items-list" id="checkoutItemsList">
+          <!-- Populated dynamically by app.js -->
+        </div>
       </div>
 
       <form class="checkout-form" id="checkoutForm">
         <div class="form-row">
           <div class="form-group">
-            <label for="custFirstName">First Name</label>
+            <label for="custFirstName">First Name *</label>
             <input type="text" id="custFirstName" required placeholder="Aarav">
           </div>
           <div class="form-group">
-            <label for="custLastName">Last Name</label>
+            <label for="custLastName">Last Name *</label>
             <input type="text" id="custLastName" required placeholder="Mukherjee">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="custPhone">Mobile Number (Required for Indian Delivery)</label>
-            <input type="tel" id="custPhone" required placeholder="9830012345" pattern="[0-9]{10}" title="Enter a valid 10-digit mobile number">
+            <label for="custPhone">Mobile Number * (For Delivery & Order Updates)</label>
+            <input type="tel" id="custPhone" required placeholder="9830012345" pattern="[0-9]{10}" title="Enter a valid 10-digit Indian mobile number">
           </div>
           <div class="form-group">
             <label for="custEmail">Email Address</label>
@@ -526,17 +537,17 @@
         </div>
 
         <div class="form-group">
-          <label for="custAddress">Complete Street Address</label>
-          <input type="text" id="custAddress" required placeholder="Flat 4B, Park Street / Salt Lake">
+          <label for="custAddress">Complete Street Address *</label>
+          <input type="text" id="custAddress" required placeholder="Flat / House No, Street, Landmark">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="custCity">City</label>
+            <label for="custCity">City *</label>
             <input type="text" id="custCity" required placeholder="Kolkata">
           </div>
           <div class="form-group">
-            <label for="custZip">Pincode (e.g. 700001)</label>
+            <label for="custZip">Pincode * (e.g. 700001)</label>
             <input type="text" id="custZip" required placeholder="700001" maxlength="6">
           </div>
         </div>
@@ -545,7 +556,7 @@
         <div class="checkout-shipping-info" id="checkoutShippingInfo">
           <div class="delivery-region-tag" id="checkoutRegionTag">📍 Detected: Kolkata Metropolitan Area</div>
           <div class="delivery-timeline-tag">
-            🚚 Estimated Timeline: <strong>7 to 10 business days</strong> 
+            🚚 Estimated Delivery: <strong>7 to 10 business days</strong> 
             (<span id="checkoutDeliveryDates">Calculating...</span>)
           </div>
         </div>
@@ -634,7 +645,14 @@
           <p class="checkout-security-note">🔒 Genuine Handcrafted Guarantee • 100% Secure Online Prepaid Payment via PhonePe & UPI (No COD)</p>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block" id="placeOrderBtn">Confirm & Place Order</button>
+        <!-- Prominent Confirm & Place Order Action -->
+        <div class="checkout-submit-wrap">
+          <button type="submit" class="btn btn-primary btn-block checkout-confirm-btn" id="placeOrderBtn">
+            <span>✅ Confirm & Place Order</span>
+            <span id="placeOrderAmountBadge" class="btn-amount-badge">₹0</span>
+          </button>
+          <p class="order-guarantee-text">✨ Carefully handcrafted & packed sustainably. Delivery in 7–10 business days.</p>
+        </div>
       </form>
     </div>
   </dialog>
@@ -643,10 +661,30 @@
   <dialog class="success-dialog" id="successDialog" closedby="any" aria-labelledby="successTitle">
     <div class="success-wrapper">
       <div class="success-icon">🎉</div>
-      <h2 id="successTitle">Thank You for Supporting RSA Creations!</h2>
-      <p>Your order <strong id="successOrderNumber">#RSA-8294</strong> has been placed. Our artisans are carefully preparing your handcrafted goods with sustainable packaging.</p>
-      <p class="success-email-note">A confirmation email has been simulated to your inbox.</p>
-      <button class="btn btn-primary" id="successCloseBtn">Continue Exploring</button>
+      <h2 id="successTitle">Order Confirmed!</h2>
+      <p>Thank you for supporting <strong>RSA Creations</strong>. Your handcrafted piece has been booked and scheduled for dispatch.</p>
+      
+      <div class="success-details-card">
+        <div class="success-detail-row">
+          <span>Order Reference ID:</span>
+          <strong id="successOrderNumber" class="order-id-badge">#RSA-KOL-8294</strong>
+        </div>
+        <div class="success-detail-row">
+          <span>Payment Mode:</span>
+          <strong style="color: #5F259F;">Online PhonePe UPI (7980883038)</strong>
+        </div>
+        <div class="success-detail-row">
+          <span>Estimated Delivery:</span>
+          <strong id="successDeliveryTimeline">7 to 10 business days</strong>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <a id="whatsappConfirmBtn" href="#" target="_blank" class="btn-whatsapp-confirm">
+          <span>💬 Send Order Receipt on WhatsApp</span>
+        </a>
+        <button class="btn btn-primary btn-block" id="successCloseBtn" style="margin-top: 10px;">Continue Shopping</button>
+      </div>
     </div>
   </dialog>
 

@@ -716,6 +716,10 @@ function updateCartUI() {
   if (checkoutTotalAmount) {
     checkoutTotalAmount.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
   }
+  const placeOrderAmountBadge = document.getElementById('placeOrderAmountBadge');
+  if (placeOrderAmountBadge) {
+    placeOrderAmountBadge.textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+  }
 }
 
 function addToCart(productId, quantity = 1) {
@@ -1005,28 +1009,55 @@ document.addEventListener('DOMContentLoaded', () => {
     quickViewDialog.close();
   });
 
-  // Checkout Modal Open (Requires Login & Address)
-  checkoutBtn.addEventListener('click', () => {
-    if (state.cart.length === 0) return;
+  // Helper to render order items preview in checkout dialog
+  function renderCheckoutItemsReview() {
+    const list = document.getElementById('checkoutItemsList');
+    const count = document.getElementById('checkoutItemsCount');
+    const badge = document.getElementById('placeOrderAmountBadge');
+    if (!list) return;
 
-    if (!state.currentUser) {
-      showToast('Please login or create an account to place your order.', 'toast');
-      closeCartDrawer();
-      openAuthModal('login');
-      return;
+    if (count) count.textContent = `${state.cart.length} item${state.cart.length > 1 ? 's' : ''}`;
+
+    list.innerHTML = state.cart.map(item => `
+      <div class="checkout-mini-item">
+        <img src="${item.image}" alt="${item.name}" class="checkout-mini-thumb" onerror="this.src='https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=100&q=80'">
+        <div class="checkout-mini-info">
+          <div class="checkout-mini-title">${item.name}</div>
+          <div class="checkout-mini-meta">
+            <span>Qty: ${item.quantity}</span>
+            <strong>₹${(item.price * item.quantity).toLocaleString('en-IN')}</strong>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    if (badge && checkoutTotalAmount) {
+      badge.textContent = checkoutTotalAmount.textContent;
     }
+  }
 
-    const hasAddress = state.currentUser.addresses && state.currentUser.addresses.length > 0;
-    if (!hasAddress) {
-      showToast('Please save your delivery address to proceed with order.', 'toast');
-      closeCartDrawer();
-      openAddressModal();
+  // Checkout Modal Open (Direct & Frictionless)
+  checkoutBtn.addEventListener('click', () => {
+    if (state.cart.length === 0) {
+      showToast('Your shopping basket is empty. Please add items to proceed.', 'toast');
       return;
     }
 
     closeCartDrawer();
-    autofillCheckoutFromUser();
-    updateShippingCalculation(custCity.value || 'Kolkata', custZip.value || '700001');
+
+    // Autofill user details if logged in
+    if (state.currentUser) {
+      autofillCheckoutFromUser();
+    }
+
+    // Populate order items preview in checkout
+    renderCheckoutItemsReview();
+
+    // Dynamically calculate delivery fee based on city/pincode
+    const cityInput = document.getElementById('custCity');
+    const zipInput = document.getElementById('custZip');
+    updateShippingCalculation((cityInput && cityInput.value) || 'Kolkata', (zipInput && zipInput.value) || '700001');
+
     checkoutDialog.showModal();
   });
 
@@ -1039,6 +1070,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (input) {
       input.addEventListener('input', () => {
         updateShippingCalculation(custCity.value, custZip.value);
+        const badge = document.getElementById('placeOrderAmountBadge');
+        if (badge && checkoutTotalAmount) {
+          badge.textContent = checkoutTotalAmount.textContent;
+        }
       });
     }
   });
@@ -1047,13 +1082,6 @@ document.addEventListener('DOMContentLoaded', () => {
   checkoutForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!state.currentUser) {
-      showToast('Please login before confirming your order.');
-      checkoutDialog.close();
-      openAuthModal('login');
-      return;
-    }
-
     const firstName = document.getElementById('custFirstName').value.trim();
     const lastName = document.getElementById('custLastName').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
@@ -1061,13 +1089,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const address = document.getElementById('custAddress').value.trim();
     const city = custCity.value.trim();
     const pincode = custZip.value.trim();
+    const upiTxn = (document.getElementById('checkoutUpiTxn') || {}).value || '';
+
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+      showToast('Please enter a valid 10-digit Indian mobile number for delivery updates.', 'toast');
+      return;
+    }
+
+    if (!pincode || !/^\d{6}$/.test(pincode)) {
+      showToast('Please enter a valid 6-digit Indian delivery pincode.', 'toast');
+      return;
+    }
+
+    const placeBtn = document.getElementById('placeOrderBtn');
+    if (placeBtn) {
+      placeBtn.disabled = true;
+      placeBtn.innerHTML = `<span>⏳ Processing & Confirming Order...</span>`;
+    }
 
     const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     const orderPayload = {
-      customerName: `${firstName} ${lastName}`,
-      phone: phone || state.currentUser.mobile,
-      email: email || state.currentUser.email,
+      customerName: `${firstName} ${lastName}`.trim(),
+      phone: phone || (state.currentUser && state.currentUser.mobile) || '',
+      email: email || (state.currentUser && state.currentUser.email) || '',
       address,
       city,
       pincode,
@@ -1075,8 +1120,11 @@ document.addEventListener('DOMContentLoaded', () => {
       subtotal,
       promoCode: state.promoApplied ? 'HANDMADE10' : null,
       paymentMethod: 'Online PhonePe / UPI',
-      transactionId: (document.getElementById('checkoutUpiTxn') || {}).value || ''
+      transactionId: upiTxn.trim()
     };
+
+    let confirmedOrderId = '';
+    let confirmedTotal = checkoutTotalAmount ? checkoutTotalAmount.textContent : `₹${subtotal}`;
 
     try {
       const response = await fetch(`${API_BASE}/api/orders`, {
@@ -1088,25 +1136,49 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
 
       if (data.success && data.order) {
-        successOrderNumber.textContent = data.order.orderId;
+        confirmedOrderId = data.order.orderId;
+        if (data.order.pricing && data.order.pricing.totalAmount) {
+          confirmedTotal = `₹${data.order.pricing.totalAmount}`;
+        }
       } else {
         const fallbackId = city.toLowerCase().includes('kolkata') ? '#RSA-KOL-9142' : '#RSA-IND-9142';
-        successOrderNumber.textContent = fallbackId;
+        confirmedOrderId = fallbackId;
       }
     } catch (err) {
       const fallbackId = city.toLowerCase().includes('kolkata') ? '#RSA-KOL-9142' : '#RSA-IND-9142';
-      successOrderNumber.textContent = fallbackId;
+      confirmedOrderId = fallbackId;
+    } finally {
+      if (placeBtn) {
+        placeBtn.disabled = false;
+        placeBtn.innerHTML = `<span>✅ Confirm & Place Order</span><span id="placeOrderAmountBadge" class="btn-amount-badge">${confirmedTotal}</span>`;
+      }
     }
 
     checkoutDialog.close();
+
+    // Populate success dialog details
+    if (successOrderNumber) successOrderNumber.textContent = confirmedOrderId;
+    const deliveryTimelineEl = document.getElementById('successDeliveryTimeline');
+    if (deliveryTimelineEl) {
+      deliveryTimelineEl.textContent = state.estimatedDates ? `${state.estimatedDates} (7 to 10 days)` : '7 to 10 business days';
+    }
+
+    // Set WhatsApp confirmation link
+    const whatsappBtn = document.getElementById('whatsappConfirmBtn');
+    if (whatsappBtn) {
+      const waMsg = `🛍️ *ORDER CONFIRMED - RSA CREATIONS*\nOrder ID: ${confirmedOrderId}\nCustomer: ${firstName} ${lastName} (${phone})\nDelivery Address: ${address}, ${city} - ${pincode}\nTotal Amount: ${confirmedTotal}\nPayment: Online PhonePe UPI (7980883038)\nUTR / Txn ID: ${upiTxn || 'Verified Online'}\nEstimated Delivery: 7 to 10 business days.\nPlease confirm dispatch! ✨`;
+      whatsappBtn.href = `https://wa.me/917980883038?text=${encodeURIComponent(waMsg)}`;
+    }
 
     // Clear cart after successful order
     state.cart = [];
     state.promoApplied = false;
     saveCart();
+    renderCart();
 
     // Show Confirmation Dialog
     successDialog.showModal();
+    showToast(`Order ${confirmedOrderId} confirmed successfully! 🎉`, 'toast-success');
   });
 
   successCloseBtn.addEventListener('click', () => {

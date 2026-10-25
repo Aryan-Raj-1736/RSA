@@ -550,6 +550,74 @@
           </div>
         </div>
 
+        <!-- Payment Method (Online Only, No COD) -->
+        <div class="checkout-payment-section">
+          <div class="payment-section-header">
+            <h4>💳 Payment Mode (Prepaid Only)</h4>
+            <span class="payment-badge-online">100% Online Secure</span>
+          </div>
+
+          <!-- COD Notice -->
+          <div class="cod-unavailable-notice">
+            <span class="cod-notice-icon">🚫</span>
+            <div>
+              <strong>Cash on Delivery (COD) Not Available</strong>
+              <p>To ensure safe doorstep delivery of fragile handcrafted pieces, we accept secure Prepaid Online Payments only.</p>
+            </div>
+          </div>
+
+          <!-- Payment Options -->
+          <div class="payment-options-grid">
+            <!-- Active Option: PhonePe / UPI -->
+            <div class="payment-option-card active" id="payPhonePeCard">
+              <div class="payment-option-header">
+                <input type="radio" name="paymentOption" id="payPhonePe" value="phonepe" checked>
+                <label for="payPhonePe" class="payment-option-title">
+                  <span class="payment-brand-badge phonepe-badge">PhonePe / UPI</span>
+                  <strong>Pay via PhonePe / Any UPI App</strong>
+                </label>
+              </div>
+
+              <div class="upi-details-box">
+                <div class="upi-id-row">
+                  <span>PhonePe UPI No:</span>
+                  <strong class="upi-number-highlight" id="phonePeNumberDisplay">7980883038</strong>
+                  <button type="button" class="btn-copy-upi" id="copyUpiBtn" title="Copy PhonePe Number">Copy 📋</button>
+                </div>
+                <div class="upi-id-row" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                  <span>UPI ID:</span>
+                  <code>7980883038@ybl</code>
+                </div>
+              </div>
+
+              <div class="upi-pay-instructions">
+                <ol>
+                  <li>Open <strong>PhonePe</strong>, GPay, Paytm, or any UPI app.</li>
+                  <li>Send the total payable amount to <strong>7980883038</strong>.</li>
+                  <li>Enter the 12-digit UPI / UTR Transaction ID below:</li>
+                </ol>
+                <div class="form-group" style="margin-top: 8px;">
+                  <label for="checkoutUpiTxn" style="font-size: 0.78rem; font-weight: 600;">UPI / UTR Transaction Reference No. (12 digits)</label>
+                  <input type="text" id="checkoutUpiTxn" placeholder="e.g. 428901234567" maxlength="16" class="upi-txn-input">
+                  <small style="font-size: 0.72rem; color: var(--text-muted);">Helps our artisans verify your prepaid payment instantly.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Disabled Option: COD -->
+            <div class="payment-option-card disabled" title="Cash on Delivery is disabled">
+              <div class="payment-option-header">
+                <input type="radio" name="paymentOption" id="payCOD" value="cod" disabled>
+                <label for="payCOD" class="payment-option-title">
+                  <span class="payment-brand-badge disabled-badge">COD Unavailable</span>
+                  <span style="color: var(--text-muted); text-decoration: line-through;">Cash on Delivery (COD)</span>
+                </label>
+              </div>
+              <p class="disabled-reason">⚠️ Cash on delivery is not accepted for handcrafted artisan items. Please pay online.</p>
+            </div>
+          </div>
+        </div>
+
         <div class="checkout-order-summary">
           <div class="checkout-summary-row">
             <span>Subtotal:</span>
@@ -563,7 +631,7 @@
             <span>Total Payable:</span>
             <strong id="checkoutTotalAmount">₹0</strong>
           </div>
-          <p class="checkout-security-note">🔒 Genuine Handcrafted Guarantee • UPI / Netbanking / COD Available</p>
+          <p class="checkout-security-note">🔒 Genuine Handcrafted Guarantee • 100% Secure Online Prepaid Payment via PhonePe & UPI (No COD)</p>
         </div>
 
         <button type="submit" class="btn btn-primary btn-block" id="placeOrderBtn">Confirm & Place Order</button>
@@ -599,6 +667,7 @@
       <div class="auth-tabs">
         <button class="auth-tab active" id="loginTab" data-tab="login">Login</button>
         <button class="auth-tab" id="signupTab" data-tab="signup">Sign Up</button>
+        <button class="auth-tab" id="recoveryTab" data-tab="recovery">Forgot Password?</button>
       </div>
 
       <!-- Login Form -->
@@ -611,8 +680,59 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" required placeholder="Enter your password" minlength="6">
         </div>
+        <div class="auth-helper-row">
+          <a href="#" id="forgotPasswordLink" class="auth-helper-link">Forgot Password or User ID?</a>
+        </div>
         <div class="auth-error" id="loginError" style="display: none;"></div>
         <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn">Login to My Account</button>
+      </form>
+
+      <!-- Forgot Password & Recover User ID Form -->
+      <form class="auth-form" id="recoveryForm" style="display: none;">
+        <div class="recovery-intro">
+          <p>Find your <strong>User ID</strong> or reset your <strong>Password</strong> using your registered 10-digit mobile number.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="recoveryMobile">Registered Mobile Number (10 digits)</label>
+          <div class="input-with-action">
+            <input type="tel" id="recoveryMobile" placeholder="e.g. 9830012345" maxlength="10">
+            <button type="button" class="btn btn-secondary btn-sm" id="findAccountBtn">Find My ID 🔍</button>
+          </div>
+          <small class="auth-hint">Enter the 10-digit mobile you registered with.</small>
+        </div>
+
+        <!-- Account Info Card (populated dynamically when Found) -->
+        <div class="recovered-account-card" id="recoveredAccountCard" style="display: none;">
+          <div class="recovered-card-header">
+            <span>✅ Account Found</span>
+            <span class="user-id-badge" id="recoveredUserId">USR-XXXX</span>
+          </div>
+          <div class="recovered-card-body">
+            <p><strong>Name:</strong> <span id="recoveredName">-</span></p>
+            <p><strong>Email:</strong> <span id="recoveredEmail">-</span></p>
+            <p><strong>Mobile:</strong> <span id="recoveredMobileDisplay">-</span></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newRecoveryPassword">New Password</label>
+          <input type="password" id="newRecoveryPassword" placeholder="Minimum 6 characters" minlength="6">
+        </div>
+
+        <div class="form-group">
+          <label for="confirmRecoveryPassword">Confirm New Password</label>
+          <input type="password" id="confirmRecoveryPassword" placeholder="Re-enter new password" minlength="6">
+        </div>
+
+        <div class="auth-error" id="recoveryError" style="display: none;"></div>
+        <div class="auth-success" id="recoverySuccess" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="recoverySubmitBtn">Reset Password & Login</button>
+
+        <div class="auth-helper-row" style="text-align: center; margin-top: 6px;">
+          <a href="#" id="backToLoginLink" class="auth-helper-link">← Back to Login</a>
+        </div>
       </form>
 
       <!-- Signup Form -->

@@ -244,6 +244,24 @@ const signupMobile = document.getElementById('signupMobile');
 const signupPassword = document.getElementById('signupPassword');
 const signupError = document.getElementById('signupError');
 
+// Recovery / Forgot Password DOM
+const recoveryTab = document.getElementById('recoveryTab');
+const recoveryForm = document.getElementById('recoveryForm');
+const recoveryMobile = document.getElementById('recoveryMobile');
+const findAccountBtn = document.getElementById('findAccountBtn');
+const recoveredAccountCard = document.getElementById('recoveredAccountCard');
+const recoveredUserId = document.getElementById('recoveredUserId');
+const recoveredName = document.getElementById('recoveredName');
+const recoveredEmail = document.getElementById('recoveredEmail');
+const recoveredMobileDisplay = document.getElementById('recoveredMobileDisplay');
+const newRecoveryPassword = document.getElementById('newRecoveryPassword');
+const confirmRecoveryPassword = document.getElementById('confirmRecoveryPassword');
+const recoveryError = document.getElementById('recoveryError');
+const recoverySuccess = document.getElementById('recoverySuccess');
+const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+const backToLoginLink = document.getElementById('backToLoginLink');
+const copyUpiBtn = document.getElementById('copyUpiBtn');
+
 // Address Dialog DOM
 const addressDialog = document.getElementById('addressDialog');
 const addressCloseBtn = document.getElementById('addressCloseBtn');
@@ -381,21 +399,34 @@ function updateAuthUI() {
 }
 
 function switchAuthTab(tab) {
+  const allTabs = [loginTab, signupTab, recoveryTab];
+  const allForms = [
+    { el: loginForm },
+    { el: signupForm },
+    { el: recoveryForm }
+  ];
+  allTabs.forEach(t => { if (t) t.classList.remove('active'); });
+  allForms.forEach(f => { if (f.el) f.el.style.display = 'none'; });
+
   if (tab === 'login') {
-    loginTab.classList.add('active');
-    signupTab.classList.remove('active');
-    loginForm.style.display = 'flex';
-    signupForm.style.display = 'none';
+    if (loginTab) loginTab.classList.add('active');
+    if (loginForm) loginForm.style.display = 'flex';
     if (authDialogTitle) authDialogTitle.textContent = 'Welcome to RSA Creations';
-  } else {
-    signupTab.classList.add('active');
-    loginTab.classList.remove('active');
-    signupForm.style.display = 'flex';
-    loginForm.style.display = 'none';
+  } else if (tab === 'signup') {
+    if (signupTab) signupTab.classList.add('active');
+    if (signupForm) signupForm.style.display = 'flex';
     if (authDialogTitle) authDialogTitle.textContent = 'Create Customer Account';
+  } else if (tab === 'recovery') {
+    if (recoveryTab) recoveryTab.classList.add('active');
+    if (recoveryForm) recoveryForm.style.display = 'flex';
+    if (authDialogTitle) authDialogTitle.textContent = 'Recover Account / Reset Password';
   }
+
+  // Hide all error/success messages
   if (loginError) loginError.style.display = 'none';
   if (signupError) signupError.style.display = 'none';
+  if (recoveryError) recoveryError.style.display = 'none';
+  if (recoverySuccess) recoverySuccess.style.display = 'none';
 }
 
 function openAuthModal(mode = 'login') {
@@ -1042,7 +1073,9 @@ document.addEventListener('DOMContentLoaded', () => {
       pincode,
       items: state.cart,
       subtotal,
-      promoCode: state.promoApplied ? 'HANDMADE10' : null
+      promoCode: state.promoApplied ? 'HANDMADE10' : null,
+      paymentMethod: 'Online PhonePe / UPI',
+      transactionId: (document.getElementById('checkoutUpiTxn') || {}).value || ''
     };
 
     try {
@@ -1120,6 +1153,160 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (signupTab) {
     signupTab.addEventListener('click', () => switchAuthTab('signup'));
+  }
+  if (recoveryTab) {
+    recoveryTab.addEventListener('click', () => switchAuthTab('recovery'));
+  }
+
+  // Forgot Password link inside login form
+  if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('recovery');
+    });
+  }
+
+  // Back to Login link inside recovery form
+  if (backToLoginLink) {
+    backToLoginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('login');
+    });
+  }
+
+  // Copy UPI Number button
+  if (copyUpiBtn) {
+    copyUpiBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('7980883038').then(() => {
+        copyUpiBtn.textContent = 'Copied! ✅';
+        showToast('PhonePe UPI Number copied: 7980883038', 'toast-success');
+        setTimeout(() => { copyUpiBtn.textContent = 'Copy 📋'; }, 2000);
+      }).catch(() => {
+        showToast('7980883038 — copy manually from above.');
+      });
+    });
+  }
+
+  // Find Account button (Recover User ID by mobile)
+  if (findAccountBtn) {
+    findAccountBtn.addEventListener('click', async () => {
+      const mobile = (recoveryMobile?.value || '').trim();
+      if (recoveryError) recoveryError.style.display = 'none';
+      if (recoverySuccess) recoverySuccess.style.display = 'none';
+      if (recoveredAccountCard) recoveredAccountCard.style.display = 'none';
+
+      if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+        if (recoveryError) {
+          recoveryError.textContent = 'Please enter a valid 10-digit Indian mobile number (e.g. 9830012345).';
+          recoveryError.style.display = 'block';
+        }
+        return;
+      }
+
+      findAccountBtn.textContent = 'Searching...';
+      findAccountBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/recover-id`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          if (recoveredAccountCard) recoveredAccountCard.style.display = 'block';
+          if (recoveredUserId) recoveredUserId.textContent = data.user.userId;
+          if (recoveredName) recoveredName.textContent = data.user.name;
+          if (recoveredEmail) recoveredEmail.textContent = data.user.email || 'Not provided';
+          if (recoveredMobileDisplay) recoveredMobileDisplay.textContent = data.user.mobile;
+        } else {
+          if (recoveryError) {
+            recoveryError.textContent = data.error || 'No account found with this mobile number.';
+            recoveryError.style.display = 'block';
+          }
+        }
+      } catch (err) {
+        if (recoveryError) {
+          recoveryError.textContent = 'Server connection error. Please try again later.';
+          recoveryError.style.display = 'block';
+        }
+      } finally {
+        findAccountBtn.textContent = 'Find My ID 🔍';
+        findAccountBtn.disabled = false;
+      }
+    });
+  }
+
+  // Recovery Form (Reset Password) Submission
+  if (recoveryForm) {
+    recoveryForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (recoveryError) recoveryError.style.display = 'none';
+      if (recoverySuccess) recoverySuccess.style.display = 'none';
+
+      const mobile = (recoveryMobile?.value || '').trim();
+      const newPwd = (newRecoveryPassword?.value || '');
+      const confirmPwd = (confirmRecoveryPassword?.value || '');
+
+      if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+        if (recoveryError) {
+          recoveryError.textContent = 'Please enter a valid 10-digit mobile number first.';
+          recoveryError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (!newPwd || newPwd.length < 6) {
+        if (recoveryError) {
+          recoveryError.textContent = 'New password must be at least 6 characters.';
+          recoveryError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        if (recoveryError) {
+          recoveryError.textContent = 'Passwords do not match. Please re-enter.';
+          recoveryError.style.display = 'block';
+        }
+        return;
+      }
+
+      const submitBtn = document.getElementById('recoverySubmitBtn');
+      if (submitBtn) { submitBtn.textContent = 'Resetting...'; submitBtn.disabled = true; }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile, newPassword: newPwd })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (recoverySuccess) {
+            recoverySuccess.textContent = '✅ ' + (data.message || 'Password reset successfully! You can now login with your new password.');
+            recoverySuccess.style.display = 'block';
+          }
+          showToast('Password reset! Login with your new password.', 'toast-success');
+          // Auto-switch to login after 2 seconds
+          setTimeout(() => { switchAuthTab('login'); }, 2500);
+        } else {
+          if (recoveryError) {
+            recoveryError.textContent = data.error || 'Password reset failed. Please check details.';
+            recoveryError.style.display = 'block';
+          }
+        }
+      } catch (err) {
+        if (recoveryError) {
+          recoveryError.textContent = 'Server connection error. Please try again later.';
+          recoveryError.style.display = 'block';
+        }
+      } finally {
+        if (submitBtn) { submitBtn.textContent = 'Reset Password & Login'; submitBtn.disabled = false; }
+      }
+    });
   }
 
   // Login Form Submission

@@ -703,12 +703,13 @@
 
       <!-- Auth Tabs -->
       <div class="auth-tabs">
-        <button class="auth-tab active" id="loginTab" data-tab="login">Login</button>
-        <button class="auth-tab" id="signupTab" data-tab="signup">Sign Up</button>
+        <button class="auth-tab active" id="loginTab" data-tab="login">Password</button>
+        <button class="auth-tab" id="otpLoginTab" data-tab="otpLogin">Login via OTP 📲</button>
         <button class="auth-tab" id="recoveryTab" data-tab="recovery">Forgot Password?</button>
+        <button class="auth-tab" id="signupTab" data-tab="signup">Sign Up</button>
       </div>
 
-      <!-- Login Form -->
+      <!-- Password Login Form -->
       <form class="auth-form" id="loginForm">
         <div class="form-group">
           <label for="loginIdentifier">Email or Mobile Number</label>
@@ -718,26 +719,62 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" required placeholder="Enter your password" minlength="6">
         </div>
-        <div class="auth-helper-row">
-          <a href="#" id="forgotPasswordLink" class="auth-helper-link">Forgot Password or User ID?</a>
+        <div class="auth-helper-row" style="display: flex; justify-content: space-between; align-items: center;">
+          <a href="#" id="loginViaOtpLink" class="auth-helper-link" style="color: #5F259F;">📲 Login via OTP instead</a>
+          <a href="#" id="forgotPasswordLink" class="auth-helper-link">Forgot Password?</a>
         </div>
         <div class="auth-error" id="loginError" style="display: none;"></div>
         <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn">Login to My Account</button>
       </form>
 
-      <!-- Forgot Password & Recover User ID Form -->
-      <form class="auth-form" id="recoveryForm" style="display: none;">
+      <!-- OTP Instant Login Form -->
+      <form class="auth-form" id="otpLoginForm" style="display: none;">
         <div class="recovery-intro">
-          <p>Find your <strong>User ID</strong> or reset your <strong>Password</strong> using your registered 10-digit mobile number.</p>
+          <p>Login quickly without any password! Enter your registered <strong>Mobile Number or Email</strong> to receive a 6-digit OTP.</p>
         </div>
 
         <div class="form-group">
-          <label for="recoveryMobile">Registered Mobile Number (10 digits)</label>
+          <label for="otpLoginIdentifier">Registered Mobile Number or Email</label>
           <div class="input-with-action">
-            <input type="tel" id="recoveryMobile" placeholder="e.g. 9830012345" maxlength="10">
-            <button type="button" class="btn btn-secondary btn-sm" id="findAccountBtn">Find My ID 🔍</button>
+            <input type="text" id="otpLoginIdentifier" placeholder="e.g. 9830012345 or user@example.com">
+            <button type="button" class="btn btn-secondary btn-sm" id="sendLoginOtpBtn">Send OTP 📩</button>
           </div>
-          <small class="auth-hint">Enter the 10-digit mobile you registered with.</small>
+          <small class="auth-hint">We'll verify your registered account instantly.</small>
+        </div>
+
+        <!-- OTP Input field (visible after sending OTP) -->
+        <div class="form-group" id="loginOtpGroup" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="loginOtpCode" style="margin: 0; font-weight: 600;">Enter 6-Digit OTP</label>
+            <button type="button" id="resendLoginOtpBtn" class="auth-helper-link" style="border: none; background: transparent; font-size: 0.75rem; cursor: pointer;">Resend OTP</button>
+          </div>
+          <input type="text" id="loginOtpCode" placeholder="Enter 6-digit OTP" maxlength="6" style="letter-spacing: 0.2em; text-align: center; font-size: 1.15rem; font-weight: 700;">
+          <small class="auth-hint" style="color: var(--color-terracotta);">Check the notification prompt or toast for your 6-digit OTP.</small>
+        </div>
+
+        <div class="auth-error" id="otpLoginError" style="display: none;"></div>
+        <div class="auth-success" id="otpLoginSuccess" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="verifyLoginOtpBtn" style="display: none;">Verify OTP & Login</button>
+
+        <div class="auth-helper-row" style="text-align: center; margin-top: 6px;">
+          <a href="#" id="backToPasswordLoginLink" class="auth-helper-link">← Login with Password</a>
+        </div>
+      </form>
+
+      <!-- Forgot Password & Recover User ID Form with OTP -->
+      <form class="auth-form" id="recoveryForm" style="display: none;">
+        <div class="recovery-intro">
+          <p>Reset your <strong>Password</strong> and recover your <strong>User ID</strong> securely via OTP verification.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="recoveryMobile">Registered Mobile Number or Email</label>
+          <div class="input-with-action">
+            <input type="text" id="recoveryMobile" placeholder="e.g. 9830012345 or user@example.com">
+            <button type="button" class="btn btn-secondary btn-sm" id="findAccountBtn">Send OTP 📩</button>
+          </div>
+          <small class="auth-hint">Enter your 10-digit mobile number or email ID.</small>
         </div>
 
         <!-- Account Info Card (populated dynamically when Found) -->
@@ -753,20 +790,29 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="newRecoveryPassword">New Password</label>
-          <input type="password" id="newRecoveryPassword" placeholder="Minimum 6 characters" minlength="6">
+        <!-- OTP verification for reset -->
+        <div class="form-group" id="recoveryOtpGroup" style="display: none;">
+          <label for="recoveryOtpCode">Enter 6-Digit OTP</label>
+          <input type="text" id="recoveryOtpCode" placeholder="Enter 6-digit OTP" maxlength="6" style="letter-spacing: 0.2em; text-align: center; font-size: 1.15rem; font-weight: 700;">
+          <small class="auth-hint" style="color: var(--color-terracotta);">Enter the 6-digit OTP received.</small>
         </div>
 
-        <div class="form-group">
-          <label for="confirmRecoveryPassword">Confirm New Password</label>
-          <input type="password" id="confirmRecoveryPassword" placeholder="Re-enter new password" minlength="6">
+        <div id="newPasswordGroup" style="display: none;">
+          <div class="form-group">
+            <label for="newRecoveryPassword">New Password</label>
+            <input type="password" id="newRecoveryPassword" placeholder="Minimum 6 characters" minlength="6">
+          </div>
+
+          <div class="form-group">
+            <label for="confirmRecoveryPassword">Confirm New Password</label>
+            <input type="password" id="confirmRecoveryPassword" placeholder="Re-enter new password" minlength="6">
+          </div>
         </div>
 
         <div class="auth-error" id="recoveryError" style="display: none;"></div>
         <div class="auth-success" id="recoverySuccess" style="display: none;"></div>
 
-        <button type="submit" class="btn btn-primary btn-block" id="recoverySubmitBtn">Reset Password & Login</button>
+        <button type="submit" class="btn btn-primary btn-block" id="recoverySubmitBtn" style="display: none;">Verify OTP & Reset Password</button>
 
         <div class="auth-helper-row" style="text-align: center; margin-top: 6px;">
           <a href="#" id="backToLoginLink" class="auth-helper-link">← Back to Login</a>

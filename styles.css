@@ -2254,19 +2254,23 @@ dialog::backdrop {
   background: var(--bg-surface-alt);
   padding: 4px;
   border-radius: var(--radius-md);
-  margin-bottom: 22px;
+  margin-bottom: 20px;
+  gap: 3px;
+  overflow-x: auto;
 }
 
 .auth-tab {
   flex: 1;
-  padding: 10px;
+  padding: 8px 6px;
   border: none;
   background: transparent;
-  font-size: 0.875rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   border-radius: var(--radius-sm);
+  white-space: nowrap;
+  text-align: center;
   transition: all var(--transition-fast);
 }
 
@@ -2274,6 +2278,26 @@ dialog::backdrop {
   background: var(--bg-surface);
   color: var(--color-terracotta);
   box-shadow: var(--shadow-sm);
+  font-weight: 700;
+}
+
+.otp-code-input {
+  letter-spacing: 0.25em;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  padding: 10px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.otp-code-input:focus {
+  border-color: #5F259F;
+  box-shadow: 0 0 0 3px rgba(95, 37, 159, 0.12);
 }
 
 /* Auth Forms */

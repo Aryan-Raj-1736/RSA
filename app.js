@@ -244,6 +244,20 @@ const signupMobile = document.getElementById('signupMobile');
 const signupPassword = document.getElementById('signupPassword');
 const signupError = document.getElementById('signupError');
 
+// OTP Login DOM
+const otpLoginTab = document.getElementById('otpLoginTab');
+const otpLoginForm = document.getElementById('otpLoginForm');
+const otpLoginIdentifier = document.getElementById('otpLoginIdentifier');
+const sendLoginOtpBtn = document.getElementById('sendLoginOtpBtn');
+const loginOtpGroup = document.getElementById('loginOtpGroup');
+const loginOtpCode = document.getElementById('loginOtpCode');
+const resendLoginOtpBtn = document.getElementById('resendLoginOtpBtn');
+const verifyLoginOtpBtn = document.getElementById('verifyLoginOtpBtn');
+const otpLoginError = document.getElementById('otpLoginError');
+const otpLoginSuccess = document.getElementById('otpLoginSuccess');
+const loginViaOtpLink = document.getElementById('loginViaOtpLink');
+const backToPasswordLoginLink = document.getElementById('backToPasswordLoginLink');
+
 // Recovery / Forgot Password DOM
 const recoveryTab = document.getElementById('recoveryTab');
 const recoveryForm = document.getElementById('recoveryForm');
@@ -254,6 +268,9 @@ const recoveredUserId = document.getElementById('recoveredUserId');
 const recoveredName = document.getElementById('recoveredName');
 const recoveredEmail = document.getElementById('recoveredEmail');
 const recoveredMobileDisplay = document.getElementById('recoveredMobileDisplay');
+const recoveryOtpGroup = document.getElementById('recoveryOtpGroup');
+const recoveryOtpCode = document.getElementById('recoveryOtpCode');
+const newPasswordGroup = document.getElementById('newPasswordGroup');
 const newRecoveryPassword = document.getElementById('newRecoveryPassword');
 const confirmRecoveryPassword = document.getElementById('confirmRecoveryPassword');
 const recoveryError = document.getElementById('recoveryError');
@@ -399,9 +416,10 @@ function updateAuthUI() {
 }
 
 function switchAuthTab(tab) {
-  const allTabs = [loginTab, signupTab, recoveryTab];
+  const allTabs = [loginTab, otpLoginTab, signupTab, recoveryTab];
   const allForms = [
     { el: loginForm },
+    { el: otpLoginForm },
     { el: signupForm },
     { el: recoveryForm }
   ];
@@ -411,7 +429,11 @@ function switchAuthTab(tab) {
   if (tab === 'login') {
     if (loginTab) loginTab.classList.add('active');
     if (loginForm) loginForm.style.display = 'flex';
-    if (authDialogTitle) authDialogTitle.textContent = 'Welcome to RSA Creations';
+    if (authDialogTitle) authDialogTitle.textContent = 'Login with Password';
+  } else if (tab === 'otpLogin') {
+    if (otpLoginTab) otpLoginTab.classList.add('active');
+    if (otpLoginForm) otpLoginForm.style.display = 'flex';
+    if (authDialogTitle) authDialogTitle.textContent = 'Instant Login via OTP 📲';
   } else if (tab === 'signup') {
     if (signupTab) signupTab.classList.add('active');
     if (signupForm) signupForm.style.display = 'flex';
@@ -423,10 +445,9 @@ function switchAuthTab(tab) {
   }
 
   // Hide all error/success messages
-  if (loginError) loginError.style.display = 'none';
-  if (signupError) signupError.style.display = 'none';
-  if (recoveryError) recoveryError.style.display = 'none';
-  if (recoverySuccess) recoverySuccess.style.display = 'none';
+  [loginError, signupError, recoveryError, recoverySuccess, otpLoginError, otpLoginSuccess].forEach(el => {
+    if (el) el.style.display = 'none';
+  });
 }
 
 function openAuthModal(mode = 'login') {
@@ -1219,9 +1240,12 @@ document.addEventListener('DOMContentLoaded', () => {
     addressCloseBtn.addEventListener('click', () => addressDialog.close());
   }
 
-  // Auth Tabs (Login / Sign Up)
+  // Auth Tabs (Login / OTP Login / Sign Up / Recovery)
   if (loginTab) {
     loginTab.addEventListener('click', () => switchAuthTab('login'));
+  }
+  if (otpLoginTab) {
+    otpLoginTab.addEventListener('click', () => switchAuthTab('otpLogin'));
   }
   if (signupTab) {
     signupTab.addEventListener('click', () => switchAuthTab('signup'));
@@ -1230,19 +1254,149 @@ document.addEventListener('DOMContentLoaded', () => {
     recoveryTab.addEventListener('click', () => switchAuthTab('recovery'));
   }
 
-  // Forgot Password link inside login form
+  // Quick switch links
+  if (loginViaOtpLink) {
+    loginViaOtpLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('otpLogin');
+    });
+  }
+  if (backToPasswordLoginLink) {
+    backToPasswordLoginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthTab('login');
+    });
+  }
   if (forgotPasswordLink) {
     forgotPasswordLink.addEventListener('click', (e) => {
       e.preventDefault();
       switchAuthTab('recovery');
     });
   }
-
-  // Back to Login link inside recovery form
   if (backToLoginLink) {
     backToLoginLink.addEventListener('click', (e) => {
       e.preventDefault();
       switchAuthTab('login');
+    });
+  }
+
+  // ==========================================================================
+  // OTP Login Flow
+  // ==========================================================================
+  async function handleSendLoginOtp() {
+    const identifier = (otpLoginIdentifier?.value || '').trim();
+    if (otpLoginError) otpLoginError.style.display = 'none';
+    if (otpLoginSuccess) otpLoginSuccess.style.display = 'none';
+
+    if (!identifier) {
+      if (otpLoginError) {
+        otpLoginError.textContent = 'Please enter your registered 10-digit mobile number or email.';
+        otpLoginError.style.display = 'block';
+      }
+      return;
+    }
+
+    if (sendLoginOtpBtn) {
+      sendLoginOtpBtn.disabled = true;
+      sendLoginOtpBtn.textContent = 'Sending...';
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, purpose: 'login' })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        if (loginOtpGroup) loginOtpGroup.style.display = 'block';
+        if (verifyLoginOtpBtn) verifyLoginOtpBtn.style.display = 'block';
+        if (otpLoginSuccess) {
+          otpLoginSuccess.textContent = `✅ ${data.message} OTP: ${data.otp}`;
+          otpLoginSuccess.style.display = 'block';
+        }
+        if (loginOtpCode && data.otp) {
+          loginOtpCode.value = data.otp; // Auto-populate for seamless 1-click login
+        }
+        showToast(`Your 6-Digit Login OTP is: ${data.otp}`, 'toast-success');
+      } else {
+        if (otpLoginError) {
+          otpLoginError.textContent = data.error || 'Failed to send OTP.';
+          otpLoginError.style.display = 'block';
+        }
+      }
+    } catch (err) {
+      if (otpLoginError) {
+        otpLoginError.textContent = 'Server connection error. Please try again.';
+        otpLoginError.style.display = 'block';
+      }
+    } finally {
+      if (sendLoginOtpBtn) {
+        sendLoginOtpBtn.disabled = false;
+        sendLoginOtpBtn.textContent = 'Resend OTP 📩';
+      }
+    }
+  }
+
+  if (sendLoginOtpBtn) sendLoginOtpBtn.addEventListener('click', handleSendLoginOtp);
+  if (resendLoginOtpBtn) resendLoginOtpBtn.addEventListener('click', handleSendLoginOtp);
+
+  // OTP Login Verification
+  if (otpLoginForm) {
+    otpLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (otpLoginError) otpLoginError.style.display = 'none';
+      if (otpLoginSuccess) otpLoginSuccess.style.display = 'none';
+
+      const identifier = (otpLoginIdentifier?.value || '').trim();
+      const otp = (loginOtpCode?.value || '').trim();
+
+      if (!identifier || !otp || otp.length !== 6) {
+        if (otpLoginError) {
+          otpLoginError.textContent = 'Please enter the complete 6-digit OTP.';
+          otpLoginError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (verifyLoginOtpBtn) {
+        verifyLoginOtpBtn.disabled = true;
+        verifyLoginOtpBtn.textContent = 'Verifying...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/verify-otp-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, otp })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+          state.currentUser = data.user;
+          localStorage.setItem('rsa_user', JSON.stringify(data.user));
+          updateAuthUI();
+          authDialog.close();
+          otpLoginForm.reset();
+          showToast(`Welcome back, ${data.user.name}! (Logged in via OTP)`, 'toast-success');
+        } else {
+          if (otpLoginError) {
+            otpLoginError.textContent = data.error || 'Incorrect or expired OTP.';
+            otpLoginError.style.display = 'block';
+          }
+        }
+      } catch (err) {
+        if (otpLoginError) {
+          otpLoginError.textContent = 'Server connection error. Please try again.';
+          otpLoginError.style.display = 'block';
+        }
+      } finally {
+        if (verifyLoginOtpBtn) {
+          verifyLoginOtpBtn.disabled = false;
+          verifyLoginOtpBtn.textContent = 'Verify OTP & Login';
+        }
+      }
     });
   }
 
@@ -1259,30 +1413,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Find Account button (Recover User ID by mobile)
+  // Find Account & Send Reset OTP button (Forgot Password / Recover User ID)
   if (findAccountBtn) {
     findAccountBtn.addEventListener('click', async () => {
-      const mobile = (recoveryMobile?.value || '').trim();
+      const identifier = (recoveryMobile?.value || '').trim();
       if (recoveryError) recoveryError.style.display = 'none';
       if (recoverySuccess) recoverySuccess.style.display = 'none';
       if (recoveredAccountCard) recoveredAccountCard.style.display = 'none';
+      if (recoveryOtpGroup) recoveryOtpGroup.style.display = 'none';
+      if (newPasswordGroup) newPasswordGroup.style.display = 'none';
+      if (recoverySubmitBtn) recoverySubmitBtn.style.display = 'none';
 
-      if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+      if (!identifier) {
         if (recoveryError) {
-          recoveryError.textContent = 'Please enter a valid 10-digit Indian mobile number (e.g. 9830012345).';
+          recoveryError.textContent = 'Please enter your registered 10-digit mobile number or email.';
           recoveryError.style.display = 'block';
         }
         return;
       }
 
-      findAccountBtn.textContent = 'Searching...';
+      findAccountBtn.textContent = 'Sending OTP...';
       findAccountBtn.disabled = true;
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/recover-id`, {
+        const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mobile })
+          body: JSON.stringify({ identifier, purpose: 'reset_password' })
         });
         const data = await res.json();
 
@@ -1292,9 +1449,23 @@ document.addEventListener('DOMContentLoaded', () => {
           if (recoveredName) recoveredName.textContent = data.user.name;
           if (recoveredEmail) recoveredEmail.textContent = data.user.email || 'Not provided';
           if (recoveredMobileDisplay) recoveredMobileDisplay.textContent = data.user.mobile;
+
+          if (recoveryOtpGroup) recoveryOtpGroup.style.display = 'block';
+          if (newPasswordGroup) newPasswordGroup.style.display = 'block';
+          if (recoverySubmitBtn) recoverySubmitBtn.style.display = 'block';
+
+          if (recoveryOtpCode && data.otp) {
+            recoveryOtpCode.value = data.otp; // Auto-fill for seamless user experience
+          }
+
+          if (recoverySuccess) {
+            recoverySuccess.textContent = `✅ Account found! OTP sent: ${data.otp}. Enter new password below.`;
+            recoverySuccess.style.display = 'block';
+          }
+          showToast(`Your Reset OTP is: ${data.otp}`, 'toast-success');
         } else {
           if (recoveryError) {
-            recoveryError.textContent = data.error || 'No account found with this mobile number.';
+            recoveryError.textContent = data.error || 'No account found with these details.';
             recoveryError.style.display = 'block';
           }
         }
@@ -1304,26 +1475,35 @@ document.addEventListener('DOMContentLoaded', () => {
           recoveryError.style.display = 'block';
         }
       } finally {
-        findAccountBtn.textContent = 'Find My ID 🔍';
+        findAccountBtn.textContent = 'Resend OTP 📩';
         findAccountBtn.disabled = false;
       }
     });
   }
 
-  // Recovery Form (Reset Password) Submission
+  // Recovery Form (Reset Password via OTP) Submission
   if (recoveryForm) {
     recoveryForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (recoveryError) recoveryError.style.display = 'none';
       if (recoverySuccess) recoverySuccess.style.display = 'none';
 
-      const mobile = (recoveryMobile?.value || '').trim();
+      const identifier = (recoveryMobile?.value || '').trim();
+      const otp = (recoveryOtpCode?.value || '').trim();
       const newPwd = (newRecoveryPassword?.value || '');
       const confirmPwd = (confirmRecoveryPassword?.value || '');
 
-      if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+      if (!identifier) {
         if (recoveryError) {
-          recoveryError.textContent = 'Please enter a valid 10-digit mobile number first.';
+          recoveryError.textContent = 'Please enter your registered mobile number or email.';
+          recoveryError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (!otp || otp.length !== 6) {
+        if (recoveryError) {
+          recoveryError.textContent = 'Please enter the 6-digit OTP received.';
           recoveryError.style.display = 'block';
         }
         return;
@@ -1346,27 +1526,30 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const submitBtn = document.getElementById('recoverySubmitBtn');
-      if (submitBtn) { submitBtn.textContent = 'Resetting...'; submitBtn.disabled = true; }
+      if (submitBtn) { submitBtn.textContent = 'Verifying & Resetting...'; submitBtn.disabled = true; }
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+        const res = await fetch(`${API_BASE}/api/auth/verify-otp-reset`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mobile, newPassword: newPwd })
+          body: JSON.stringify({ identifier, otp, newPassword: newPwd })
         });
         const data = await res.json();
 
-        if (data.success) {
+        if (data.success && data.user) {
+          state.currentUser = data.user;
+          localStorage.setItem('rsa_user', JSON.stringify(data.user));
+          updateAuthUI();
+
           if (recoverySuccess) {
-            recoverySuccess.textContent = '✅ ' + (data.message || 'Password reset successfully! You can now login with your new password.');
+            recoverySuccess.textContent = '✅ ' + (data.message || 'Password reset successfully! You are now logged in.');
             recoverySuccess.style.display = 'block';
           }
-          showToast('Password reset! Login with your new password.', 'toast-success');
-          // Auto-switch to login after 2 seconds
-          setTimeout(() => { switchAuthTab('login'); }, 2500);
+          showToast('Password reset successfully! Logged into your account.', 'toast-success');
+          setTimeout(() => { authDialog.close(); }, 1800);
         } else {
           if (recoveryError) {
-            recoveryError.textContent = data.error || 'Password reset failed. Please check details.';
+            recoveryError.textContent = data.error || 'Password reset failed. Please check OTP.';
             recoveryError.style.display = 'block';
           }
         }
@@ -1376,7 +1559,7 @@ document.addEventListener('DOMContentLoaded', () => {
           recoveryError.style.display = 'block';
         }
       } finally {
-        if (submitBtn) { submitBtn.textContent = 'Reset Password & Login'; submitBtn.disabled = false; }
+        if (submitBtn) { submitBtn.textContent = 'Verify OTP & Reset Password'; submitBtn.disabled = false; }
       }
     });
   }
